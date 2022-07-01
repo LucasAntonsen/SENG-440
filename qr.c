@@ -29,7 +29,9 @@ int main(int argc, char *argv[]) {
 
 void fscanm(char *fname, char *delim, SIZE_T rows, SIZE_T cols, DATA_T A[rows][cols]) {
 	FILE *fptr = openf(fname, "r");	
-	char line[rows * cols];
+	SIZE_T line_size = 0;
+	line_size = (SIZE_T) ~(line_size & 0);
+	char line[line_size]; 
 	char *tok;
 	SIZE_T i, j;	
 			
