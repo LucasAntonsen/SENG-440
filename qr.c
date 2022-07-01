@@ -8,37 +8,40 @@
 #define DATA_T int
 
 FILE *openf(char *fname, char *mode);
+void fscanm(char *fname, char* delim, SIZE_T rows, SIZE_T cols, DATA_T A[rows][cols]);
 SIZE_T linear(SIZE_T x, SIZE_T slope, SIZE_T intercept);
 void printm(SIZE_T rows, SIZE_T cols, DATA_T A[rows][cols]);
 void make_format(char *format, SIZE_T size);
 
 int main(int argc, char *argv[]) {
 	char *fname = argv[1];
-	SIZE_T ROWS = atoi(argv[2]);
-	SIZE_T COLS = atoi(argv[3]);
+	SIZE_T ROWS = (SIZE_T) atoi(argv[2]);
+	SIZE_T COLS = (SIZE_T) atoi(argv[3]);
 	
 	DATA_T mat[ROWS][COLS];
-	SIZE_T line_size = linear(COLS, 2, 1);
-	char line[line_size];
 	char delim[2] = " ";
-	char *tok;
 	
-	SIZE_T i, j;	
-	FILE *fptr = openf(fname, "r");	
-	
-	for (i=0; i<ROWS; ++i) {
-		fgets(line, line_size, fptr);
-		tok = strtok(line, delim);
-		for (j=0; j<COLS; ++j) {
-			mat[i][j] = (DATA_T) atoi(tok);
-			tok = strtok(NULL, delim);
-		}
-	}	
-	fclose(fptr);
-	
+	fscanm(fname, delim, ROWS, COLS, mat);	
 	printm(ROWS, COLS, mat);
 	
 	return 0;
+}
+
+void fscanm(char *fname, char *delim, SIZE_T rows, SIZE_T cols, DATA_T A[rows][cols]) {
+	FILE *fptr = openf(fname, "r");	
+	char line[rows * cols];
+	char *tok;
+	SIZE_T i, j;	
+			
+	for (i=0; i<rows; ++i) {
+		fgets(line, sizeof(line), fptr);
+		tok = strtok(line, delim);
+		for (j=0; j<cols; ++j) {
+			A[i][j] = (DATA_T) atoi(tok);
+			tok = strtok(NULL, delim);
+		}
+	}	
+	fclose(fptr);	
 }
 
 void printm(SIZE_T rows, SIZE_T cols, DATA_T A[rows][cols]) {
