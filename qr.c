@@ -14,7 +14,8 @@
 
 
 FILE *openf(char *fname, char *mode);
-void fscanm(char *fname, char* delim, SIZE_T rows, SIZE_T cols, DATA_T A[rows][cols]);
+void fscanm(char *fname, char *delim, SIZE_T rows, SIZE_T cols, DATA_T A[rows][cols]);
+void fprintm(char *fname, char *delim, SIZE_T rows, SIZE_T cols, DATA_T A[rows][cols]);
 void printm(SIZE_T rows, SIZE_T cols, DATA_T A[rows][cols]);
 void printv(SIZE_T size, DATA_T v[size]);
 char *spec_map(char type);
@@ -41,9 +42,11 @@ void QR(
 int main(int argc, char *argv[]) {
 	char *end;
 	char delim[] = " ";	
-	char *fname = argv[1];
-	SIZE_T ROWS = (SIZE_T) strtoull(argv[2], &end, 10);
-	SIZE_T COLS = (SIZE_T) strtoull(argv[3], &end, 10);
+	assert(argc == 5);
+	char *fin = argv[1];
+	char *fout =argv[2];
+	SIZE_T ROWS = (SIZE_T) strtoull(argv[3], &end, 10);
+	SIZE_T COLS = (SIZE_T) strtoull(argv[4], &end, 10);
 	
 
 	DATA_T A[ROWS][COLS];
@@ -51,17 +54,13 @@ int main(int argc, char *argv[]) {
 	DATA_T Q[ROWS][ROWS];
 	DATA_T R[ROWS][COLS];
 	
-	fscanm(fname, delim, ROWS, COLS, A);	
+	fscanm(fin, delim, ROWS, COLS, A);	
 	transpose_m(ROWS, COLS, A, At);
 	
-	printf("A:\n");
-	printm(ROWS, COLS, A);
-	
 	QR(ROWS, COLS, A, At, Q, R);
-	printf("\nQ:\n");
-	printm(ROWS, ROWS, Q);
-	printf("\nR:\n");
-	printm(ROWS, COLS, R);	
+	
+	fprintm(fout, delim, ROWS, ROWS, Q);
+	fprintm(fout, delim, ROWS, COLS, R);	
 	return 0;
 }
 
@@ -228,8 +227,22 @@ void fscanm(char *fname, char *delim, SIZE_T rows, SIZE_T cols, DATA_T A[rows][c
 	fclose(fptr);	
 }
 
+void fprintm(char *fname, char *delim, SIZE_T rows, SIZE_T cols, DATA_T A[rows][cols]) {
+	FILE *fptr = openf(fname, "a");
+	SIZE_T i, j;
+	
+	for (i=0; i<rows; ++i) {
+		for (j=0; j<cols; ++j) {
+			fprintf(fptr, spec_map(DATA_T_KEY), A[i][j]);
+		}
+		fprintf(fptr, "\n");
+	}
+	fprintf(fptr, "\n");	
+	fclose(fptr);
+}
+
 void printm(SIZE_T rows, SIZE_T cols, DATA_T A[rows][cols]) {
-	SIZE_T i,j;	
+	SIZE_T i, j;	
 	for (i=0; i<rows; ++i) {
 		for (j=0; j<cols; ++j) {
 			printf(spec_map(DATA_T_KEY), A[i][j]);
@@ -276,4 +289,9 @@ char *spec_map(char type) {
 			break;
 	}	
 	return spec;	
+}
+
+char *build_format() {
+	
+	
 }
