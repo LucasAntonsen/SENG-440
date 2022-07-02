@@ -6,10 +6,10 @@
 
 
 #define SIZE_T uint16_t
-#define DATA_T float
-#define DATA_T_KEY 'f'
-#define TOLERANCE 1e-6
-#define EPSILON 1e-8
+#define DATA_T double
+#define DATA_T_KEY 'd'
+#define TOLERANCE 1e-4
+#define EPSILON 1e-10
 #define MAX_ITER 50000
 
 
@@ -46,18 +46,18 @@ int main(int argc, char *argv[]) {
 	SIZE_T COLS = (SIZE_T) strtoull(argv[3], &end, 10);
 	
 
-	DATA_T M[ROWS][COLS];
-	DATA_T Mt[COLS][ROWS];
+	DATA_T A[ROWS][COLS];
+	DATA_T At[COLS][ROWS];
 	DATA_T Q[ROWS][ROWS];
 	DATA_T R[ROWS][COLS];
 	
-	fscanm(fname, delim, ROWS, COLS, M);	
-	transpose_m(ROWS, COLS, M, Mt);
+	fscanm(fname, delim, ROWS, COLS, A);	
+	transpose_m(ROWS, COLS, A, At);
 	
-	printf("M:\n");
-	printm(ROWS, COLS, M);
+	printf("A:\n");
+	printm(ROWS, COLS, A);
 	
-	QR(ROWS, COLS, M, Mt, Q, R);
+	QR(ROWS, COLS, A, At, Q, R);
 	printf("\nQ:\n");
 	printm(ROWS, ROWS, Q);
 	printf("\nR:\n");
