@@ -6,7 +6,7 @@
 
 
 #define SIZE_T uint16_t
-#define DATA_T double
+#define DATA_T float
 #define DATA_T_NAME 'f'
 #define TOLERANCE 1e-6
 #define EPSILON 1e-8
@@ -15,7 +15,6 @@
 
 FILE *openf(char *fname, char *mode);
 void fscanm(char *fname, char* delim, SIZE_T rows, SIZE_T cols, DATA_T A[rows][cols]);
-SIZE_T linear(SIZE_T x, SIZE_T slope, SIZE_T intercept);
 void printm(SIZE_T rows, SIZE_T cols, DATA_T A[rows][cols]);
 char *spec_map(char type);
 double l2_norm(SIZE_T size, DATA_T x[size]);
@@ -23,7 +22,7 @@ double sqr_rt(DATA_T x, double eps, double tol, size_t max_iter);
 double abs_val(double x);
 int closest_perfect_square(double x, size_t max_iter);
 void transpose_m(SIZE_T rows, SIZE_T cols, DATA_T A[rows][cols], DATA_T B[cols][rows]);
-
+void vec_div(SIZE_T size, DATA_T v[size], double divisor);
 
 
 int main(int argc, char *argv[]) {
@@ -32,19 +31,38 @@ int main(int argc, char *argv[]) {
 	SIZE_T ROWS = (SIZE_T) strtoull(argv[2], &end, 10);
 	SIZE_T COLS = (SIZE_T) strtoull(argv[3], &end, 10);
 	
-	DATA_T M1[ROWS][COLS];
-	DATA_T M2[COLS][ROWS];
+	DATA_T M[ROWS][COLS];
+	DATA_T Mt[COLS][ROWS];
 	char delim[] = " ";
 	
-	fscanm(fname, delim, ROWS, COLS, M1);	
-	printf("M1:\n");
-	printm(ROWS, COLS, M1);
-	double norm = l2_norm(COLS, M1[0]);
-	transpose_m(ROWS, COLS, M1, M2);
-	printf("\nM2:\n");
-	printm(COLS, ROWS, M2);	
-	
+	fscanm(fname, delim, ROWS, COLS, M);	
+	transpose_m(ROWS, COLS, M, Mt);
+	printf("M:\n");
+	printm(ROWS, COLS, M);
+	vec_div(COLS, M[0], 2);	
+	printf("\nM:\n");
+	printm(ROWS, COLS, M);
 	return 0;
+}
+
+void QR(
+		SIZE_T rows, 
+		SIZE_T cols, 
+		DATA_T A[rows][cols], 
+		DATA_T At[cols][rows], 
+		DATA_T Q[rows][rows], 
+		DATA_T R[rows][cols]) {
+	return;	
+}
+
+void vec_div(SIZE_T size, DATA_T v[size], double divisor) {
+	assert(divisor > EPSILON);	
+	SIZE_T i;
+	
+	for (i=0; i<size; ++i) {
+		v[i] /= divisor;
+	}
+	
 }
 
 void transpose_m(SIZE_T rows, SIZE_T cols, DATA_T A[rows][cols], DATA_T B[cols][rows]) {
@@ -150,19 +168,15 @@ FILE *openf(char *fname, char *mode) {
 	return fptr;
 }
 
-SIZE_T linear(SIZE_T x, SIZE_T slope, SIZE_T intercept) {
-	return (x * slope) + intercept;
-}
-
 char *spec_map(char type) {
 	char *spec;
 	switch (type) {
 		case 'd':
-			spec = "%lf ";
+			spec = "%.4lf ";
 			break;
 	
 		case 'f':
-			spec = "%f ";
+			spec = "%.4f ";
 			break;
 
 		case 'u':
