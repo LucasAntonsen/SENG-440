@@ -23,28 +23,45 @@ double sqr_rt(DATA_T x, double eps, double tol, size_t max_iter);
 double abs_val(double x);
 int closest_perfect_square(double x, size_t max_iter);
 void transpose_m(SIZE_T rows, SIZE_T cols, DATA_T A[rows][cols], DATA_T B[cols][rows]);
-void vec_div(SIZE_T size, DATA_T v[size], double divisor);
 void vec_copy(SIZE_T size, DATA_T src[size], DATA_T dest[size]);
-
+double vec_dot(SIZE_T size, DATA_T v1[size], DATA_T v2[size]);
+void vec_div(SIZE_T size, DATA_T v[size], double divisor);
+void vec_mulc(SIZE_T size, DATA_T v[size], double c);
+void vec_mul(SIZE_T size, DATA_T src[size], DATA_T dest[size]);
+void vec_sub(SIZE_T size, DATA_T v1[size], DATA_T v2[size]);
+void QR(
+		SIZE_T rows, 
+		SIZE_T cols, 
+		DATA_T A[rows][cols], 
+		DATA_T At[cols][rows], 
+		DATA_T Q[rows][rows], 
+		DATA_T R[rows][cols]);
 
 
 int main(int argc, char *argv[]) {
 	char *end;
+	char delim[] = " ";	
 	char *fname = argv[1];
 	SIZE_T ROWS = (SIZE_T) strtoull(argv[2], &end, 10);
 	SIZE_T COLS = (SIZE_T) strtoull(argv[3], &end, 10);
 	
+
 	DATA_T M[ROWS][COLS];
 	DATA_T Mt[COLS][ROWS];
-	char delim[] = " ";
+	DATA_T Q[ROWS][ROWS];
+	DATA_T R[ROWS][COLS];
 	
 	fscanm(fname, delim, ROWS, COLS, M);	
 	transpose_m(ROWS, COLS, M, Mt);
 	
 	printf("M:\n");
 	printm(ROWS, COLS, M);
-	printf("M_j=1:\n");
-	printv(ROWS, Mt[0]);
+	
+	QR(ROWS, COLS, M, Mt, Q, R);
+	printf("\nQ:\n");
+	printm(ROWS, ROWS, Q);
+	printf("\nR:\n");
+	printm(ROWS, COLS, R);	
 	return 0;
 }
 
@@ -56,12 +73,32 @@ void QR(
 		DATA_T Q[rows][rows], 
 		DATA_T R[rows][cols]) {
 	
-	DATA_T y[rows];
+	assert(rows >= cols);
+	DATA_T y[rows], q[rows];
+	double y_norm;
 	SIZE_T i, j;	
+	
+	for (j=0; j<cols; ++j) {
+		vec_copy(rows, At[j], y);
+		vec_copy(rows, y, q);
+		y_norm = l2_norm(rows, y);	
+		vec_div(rows, q, y_norm);
+		
+		for (i=0; i<j-1; ++i) {
+			R[i][j] = vec_dot(rows, q, y);
+			vec_mulc(rows, q, R[i][j]); 
+			vec_sub(rows, q, y);
+		}
+		R[j][j] = l2_norm(rows, y);
+		vec_div(rows, y, R[j][j]);
+		vec_copy(rows, y, Q[j]);
+	}
+}
 
-	for (i=0; i<cols; ++i) {
-		vec_copy(rows, At[i], y);
-			
+void vec_sub(SIZE_T size, DATA_T v1[size], DATA_T v2[size]) {
+	SIZE_T i;
+	for (i=0; i<size; ++i) {
+		v2[i] -= v1[i];
 	}
 }
 
@@ -69,6 +106,23 @@ void vec_copy(SIZE_T size, DATA_T src[size], DATA_T dest[size]) {
 	SIZE_T i;
 	for (i=0; i<size; ++i) {
 		dest[i] = src[i];
+	}
+}
+
+double vec_dot(SIZE_T size, DATA_T v1[size], DATA_T v2[size]) {
+	DATA_T res=0;
+	SIZE_T i;
+	
+	for (i=0; i<size; ++i) {
+		res += (v1[i] * v2[i]);
+	}
+	return res;
+}
+
+void vec_mulc(SIZE_T size, DATA_T v[size], double c) {
+	SIZE_T i;
+	for (i=0; i<size; ++i) {
+		v[i] *= c;
 	}
 }
 
