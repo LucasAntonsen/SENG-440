@@ -6,12 +6,15 @@
 
 #define SIZE_T uint16_t
 #define DATA_T int
+#define DATA_T_NAME 'i'
+
 
 FILE *openf(char *fname, char *mode);
 void fscanm(char *fname, char* delim, SIZE_T rows, SIZE_T cols, DATA_T A[rows][cols]);
 SIZE_T linear(SIZE_T x, SIZE_T slope, SIZE_T intercept);
 void printm(SIZE_T rows, SIZE_T cols, DATA_T A[rows][cols]);
 void make_format(char *format, SIZE_T size);
+char *spec_map(char type);
 
 int main(int argc, char *argv[]) {
 	char *end;
@@ -19,13 +22,36 @@ int main(int argc, char *argv[]) {
 	SIZE_T ROWS = (SIZE_T) strtoul(argv[2], &end, 10);
 	SIZE_T COLS = (SIZE_T) strtoul(argv[3], &end, 10);
 	
+	
 	DATA_T mat[ROWS][COLS];
-	char delim[2] = " ";
+	char delim[] = " ";
 	
 	fscanm(fname, delim, ROWS, COLS, mat);	
 	printm(ROWS, COLS, mat);
 	
 	return 0;
+}
+
+char *spec_map(char type) {
+	char *spec;
+	switch (type) {
+		case 'd':
+			spec = "%lf ";
+			break;
+	
+		case 'f':
+			spec = "%f ";
+			break;
+
+		case 'u':
+			spec = "%u ";
+			break;
+		
+		case 'i':
+			spec = "%i ";
+			break;
+	}	
+	return spec;	
 }
 
 void fscanm(char *fname, char *delim, SIZE_T rows, SIZE_T cols, DATA_T A[rows][cols]) {
@@ -41,7 +67,7 @@ void fscanm(char *fname, char *delim, SIZE_T rows, SIZE_T cols, DATA_T A[rows][c
 		fgets(line, sizeof(line), fptr);
 		tok = strtok(line, delim);
 		for (j=0; j<cols; ++j) {
-			A[i][j] = (DATA_T) strtoll(tok, &end, 10);
+			A[i][j] = (DATA_T) strtod(tok, &end);
 			tok = strtok(NULL, delim);
 		}
 	}	
@@ -52,7 +78,7 @@ void printm(SIZE_T rows, SIZE_T cols, DATA_T A[rows][cols]) {
 	SIZE_T i,j;	
 	for (i=0; i<rows; ++i) {
 		for (j=0; j<cols; ++j) {
-			printf("%d ", A[i][j]);
+			printf(spec_map(DATA_T_NAME), A[i][j]);
 		}
 		printf("\n");
 	}	
