@@ -7,7 +7,7 @@
 
 #define SIZE_T uint16_t
 #define DATA_T float
-#define DATA_T_NAME 'f'
+#define DATA_T_KEY 'f'
 #define TOLERANCE 1e-6
 #define EPSILON 1e-8
 #define MAX_ITER 50000
@@ -16,6 +16,7 @@
 FILE *openf(char *fname, char *mode);
 void fscanm(char *fname, char* delim, SIZE_T rows, SIZE_T cols, DATA_T A[rows][cols]);
 void printm(SIZE_T rows, SIZE_T cols, DATA_T A[rows][cols]);
+void printv(SIZE_T size, DATA_T v[size]);
 char *spec_map(char type);
 double l2_norm(SIZE_T size, DATA_T x[size]);
 double sqr_rt(DATA_T x, double eps, double tol, size_t max_iter);
@@ -23,6 +24,8 @@ double abs_val(double x);
 int closest_perfect_square(double x, size_t max_iter);
 void transpose_m(SIZE_T rows, SIZE_T cols, DATA_T A[rows][cols], DATA_T B[cols][rows]);
 void vec_div(SIZE_T size, DATA_T v[size], double divisor);
+void vec_copy(SIZE_T size, DATA_T src[size], DATA_T dest[size]);
+
 
 
 int main(int argc, char *argv[]) {
@@ -37,11 +40,11 @@ int main(int argc, char *argv[]) {
 	
 	fscanm(fname, delim, ROWS, COLS, M);	
 	transpose_m(ROWS, COLS, M, Mt);
+	
 	printf("M:\n");
 	printm(ROWS, COLS, M);
-	vec_div(COLS, M[0], 2);	
-	printf("\nM:\n");
-	printm(ROWS, COLS, M);
+	printf("M_j=1:\n");
+	printv(ROWS, Mt[0]);
 	return 0;
 }
 
@@ -52,7 +55,30 @@ void QR(
 		DATA_T At[cols][rows], 
 		DATA_T Q[rows][rows], 
 		DATA_T R[rows][cols]) {
-	return;	
+	
+	DATA_T y[rows];
+	SIZE_T i, j;	
+
+	for (i=0; i<cols; ++i) {
+		vec_copy(rows, At[i], y);
+			
+	}
+}
+
+void vec_copy(SIZE_T size, DATA_T src[size], DATA_T dest[size]) {
+	SIZE_T i;
+	for (i=0; i<size; ++i) {
+		dest[i] = src[i];
+	}
+}
+
+void vec_mul(SIZE_T size, DATA_T src[size], DATA_T dest[size]) {
+	SIZE_T i;
+	
+	for (i=0; i<size; ++i) {
+		dest[i] *= src[i]; 
+	}
+	
 }
 
 void vec_div(SIZE_T size, DATA_T v[size], double divisor) {
@@ -137,6 +163,7 @@ void fscanm(char *fname, char *delim, SIZE_T rows, SIZE_T cols, DATA_T A[rows][c
 	char *tok;
 	char *end;
 	SIZE_T i, j;	
+	
 	for (i=0; i<rows; ++i) {
 		fgets(line, sizeof(line), fptr);
 		tok = strtok(line, delim);
@@ -152,10 +179,18 @@ void printm(SIZE_T rows, SIZE_T cols, DATA_T A[rows][cols]) {
 	SIZE_T i,j;	
 	for (i=0; i<rows; ++i) {
 		for (j=0; j<cols; ++j) {
-			printf(spec_map(DATA_T_NAME), A[i][j]);
+			printf(spec_map(DATA_T_KEY), A[i][j]);
 		}
 		printf("\n");
 	}	
+}
+
+void printv(SIZE_T size, DATA_T v[size]) {
+	SIZE_T i;
+	for (i=0; i<size; ++i) {
+		printf(spec_map(DATA_T_KEY), v[i]);
+		printf("\n");
+	}
 }
 
 FILE *openf(char *fname, char *mode) {
