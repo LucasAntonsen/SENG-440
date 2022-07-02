@@ -290,8 +290,3 @@ char *spec_map(char type) {
 	}	
 	return spec;	
 }
-
-char *build_format() {
-	
-	
-}
