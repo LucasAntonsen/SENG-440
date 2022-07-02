@@ -4,23 +4,26 @@
 #include <stdint.h>
 #include <assert.h>
 
+
 #define SIZE_T uint16_t
-#define DATA_T float
+#define DATA_T double
 #define DATA_T_NAME 'f'
 #define TOLERANCE 1e-6
 #define EPSILON 1e-8
-#define MAX_ITER 500000
+#define MAX_ITER 50000
+
 
 FILE *openf(char *fname, char *mode);
 void fscanm(char *fname, char* delim, SIZE_T rows, SIZE_T cols, DATA_T A[rows][cols]);
 SIZE_T linear(SIZE_T x, SIZE_T slope, SIZE_T intercept);
 void printm(SIZE_T rows, SIZE_T cols, DATA_T A[rows][cols]);
-void make_format(char *format, SIZE_T size);
 char *spec_map(char type);
 double l2_norm(SIZE_T size, DATA_T x[size]);
 double sqr_rt(DATA_T x, double eps, double tol, size_t max_iter);
 double abs_val(double x);
-int closest_perfect_square(double x, double tol, size_t max_iter);
+int closest_perfect_square(double x, size_t max_iter);
+void transpose_m(SIZE_T rows, SIZE_T cols, DATA_T A[rows][cols], DATA_T B[cols][rows]);
+
 
 
 int main(int argc, char *argv[]) {
@@ -29,16 +32,28 @@ int main(int argc, char *argv[]) {
 	SIZE_T ROWS = (SIZE_T) strtoull(argv[2], &end, 10);
 	SIZE_T COLS = (SIZE_T) strtoull(argv[3], &end, 10);
 	
-	
-	DATA_T mat[ROWS][COLS];
+	DATA_T M1[ROWS][COLS];
+	DATA_T M2[COLS][ROWS];
 	char delim[] = " ";
 	
-	fscanm(fname, delim, ROWS, COLS, mat);	
-	printm(ROWS, COLS, mat);
-	double norm = l2_norm(COLS, mat[0]);
-	printf("norm: %lf\n", norm);	
+	fscanm(fname, delim, ROWS, COLS, M1);	
+	printf("M1:\n");
+	printm(ROWS, COLS, M1);
+	double norm = l2_norm(COLS, M1[0]);
+	transpose_m(ROWS, COLS, M1, M2);
+	printf("\nM2:\n");
+	printm(COLS, ROWS, M2);	
 	
 	return 0;
+}
+
+void transpose_m(SIZE_T rows, SIZE_T cols, DATA_T A[rows][cols], DATA_T B[cols][rows]) {
+	SIZE_T i, j;
+	for (i=0; i<cols; ++i) {
+		for (j=0; j<rows; ++j) {
+			B[i][j] = A[j][i];
+		}
+	}
 }
 
 double l2_norm(SIZE_T size, DATA_T vec[size]) {
@@ -48,13 +63,12 @@ double l2_norm(SIZE_T size, DATA_T vec[size]) {
 	for (i=0; i<size; ++i) {
 		res += vec[i] * vec[i];
 	}
-	printf("sum of squares: %lf\n", res);
 	res = sqr_rt(res, EPSILON, TOLERANCE, MAX_ITER);
 	return res;
 }
 
 double sqr_rt(DATA_T x, double eps, double tol, size_t max_iter) {
-	double x0 = closest_perfect_square(x, tol, max_iter);
+	double x0 = closest_perfect_square(x, MAX_ITER);
 	double xn;
 	double f_n, f_prime;
 	size_t i;
@@ -79,7 +93,7 @@ double sqr_rt(DATA_T x, double eps, double tol, size_t max_iter) {
 	return xn;
 }
 
-int closest_perfect_square(double x, double tol, size_t max_iter) {
+int closest_perfect_square(double x, size_t max_iter) {
 	int xn = 0, x0 = 1;
 	size_t i;
 	
@@ -90,7 +104,6 @@ int closest_perfect_square(double x, double tol, size_t max_iter) {
 		}
 		x0 += 1;
 	}
-	printf("closest perfect square: %d\n", x0);
 	return x0;
 }
 
@@ -106,7 +119,6 @@ void fscanm(char *fname, char *delim, SIZE_T rows, SIZE_T cols, DATA_T A[rows][c
 	char *tok;
 	char *end;
 	SIZE_T i, j;	
-			
 	for (i=0; i<rows; ++i) {
 		fgets(line, sizeof(line), fptr);
 		tok = strtok(line, delim);
@@ -114,7 +126,7 @@ void fscanm(char *fname, char *delim, SIZE_T rows, SIZE_T cols, DATA_T A[rows][c
 			A[i][j] = (DATA_T) strtod(tok, &end);
 			tok = strtok(NULL, delim);
 		}
-	}	
+	}
 	fclose(fptr);	
 }
 
@@ -132,7 +144,7 @@ FILE *openf(char *fname, char *mode) {
 	FILE *fptr = fopen(fname, mode);	
 	
 	if (fptr == NULL) {
-		printf("cannot open matrix file\n");
+		fprintf(stderr, "FileError: cannot open %s\n", fname);
 		exit(0);
 	}	
 	return fptr;
@@ -162,14 +174,5 @@ char *spec_map(char type) {
 			break;
 	}	
 	return spec;	
-}
-
-void make_format(char *format, SIZE_T size) {
-	SIZE_T j;
-	for (j=0; j < size-2; j=j+3) {
-		format[j] = '%';
-		format[j+1] = 'd';
-		format[j+2] = ' ';
-	}
 }
 
