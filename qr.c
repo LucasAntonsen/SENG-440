@@ -172,7 +172,7 @@ double sqr_rt(DATA_T x, double eps, double tol, size_t max_iter) {
 	size_t i;
 	
 	for (i=0; i<max_iter; ++i) { 
-		f_n = x0 * x0;
+		f_n = (x0 * x0) - (double)x;
 		f_prime = 2. * x0;
 		
 		if (abs_val(f_prime) < eps) {
@@ -180,13 +180,12 @@ double sqr_rt(DATA_T x, double eps, double tol, size_t max_iter) {
 			break;
 		}
 		
-		xn = x0 - ((f_n - (double)x) / f_prime);
-		x0 = xn;
+		xn = x0 - (f_n / f_prime);
 		
 		if (abs_val(xn - x0) <= tol) {
 			break;	
 		}
-		
+		x0 = xn;	
 	}
 	return xn;
 }
@@ -278,4 +277,3 @@ char *spec_map(char type) {
 	}	
 	return spec;	
 }
-
