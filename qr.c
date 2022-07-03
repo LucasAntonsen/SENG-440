@@ -255,9 +255,11 @@ void printm(char *delim, SIZE_T rows, SIZE_T cols, DATA_T A[rows][cols]) {
 }
 
 void printv(SIZE_T size, DATA_T v[size]) {
+	char *spec = spec_map(DATA_T_KEY);
 	SIZE_T i;
+	
 	for (i=0; i<size; ++i) {
-		printf(spec_map(DATA_T_KEY), v[i]);
+		printf(spec, v[i]);
 		printf("\n");
 	}
 }
