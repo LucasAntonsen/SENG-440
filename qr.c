@@ -16,7 +16,7 @@
 FILE *openf(char *fname, char *mode);
 void fscanm(char *fname, char *delim, SIZE_T rows, SIZE_T cols, DATA_T A[rows][cols]);
 void fprintm(char *fname, char *delim, SIZE_T rows, SIZE_T cols, DATA_T A[rows][cols]);
-void printm(SIZE_T rows, SIZE_T cols, DATA_T A[rows][cols]);
+void printm(char *delim, SIZE_T rows, SIZE_T cols, DATA_T A[rows][cols]);
 void printv(SIZE_T size, DATA_T v[size]);
 char *spec_map(char type);
 double l2_norm(SIZE_T size, DATA_T x[size]);
@@ -130,8 +130,7 @@ void vec_mul(SIZE_T size, DATA_T src[size], DATA_T dest[size]) {
 	
 	for (i=0; i<size; ++i) {
 		dest[i] *= src[i]; 
-	}
-	
+	}	
 }
 
 void vec_div(SIZE_T size, DATA_T v[size], double divisor) {
@@ -140,8 +139,7 @@ void vec_div(SIZE_T size, DATA_T v[size], double divisor) {
 	
 	for (i=0; i<size; ++i) {
 		v[i] /= divisor;
-	}
-	
+	}	
 }
 
 void transpose_m(SIZE_T rows, SIZE_T cols, DATA_T A[rows][cols], DATA_T B[cols][rows]) {
@@ -229,11 +227,13 @@ void fscanm(char *fname, char *delim, SIZE_T rows, SIZE_T cols, DATA_T A[rows][c
 
 void fprintm(char *fname, char *delim, SIZE_T rows, SIZE_T cols, DATA_T A[rows][cols]) {
 	FILE *fptr = openf(fname, "a");
+	char *spec = spec_map(DATA_T_KEY);
 	SIZE_T i, j;
 	
 	for (i=0; i<rows; ++i) {
 		for (j=0; j<cols; ++j) {
-			fprintf(fptr, spec_map(DATA_T_KEY), A[i][j]);
+			fprintf(fptr, spec, A[i][j]);
+			fprintf(fptr, delim);
 		}
 		fprintf(fptr, "\n");
 	}
@@ -241,11 +241,14 @@ void fprintm(char *fname, char *delim, SIZE_T rows, SIZE_T cols, DATA_T A[rows][
 	fclose(fptr);
 }
 
-void printm(SIZE_T rows, SIZE_T cols, DATA_T A[rows][cols]) {
+void printm(char *delim, SIZE_T rows, SIZE_T cols, DATA_T A[rows][cols]) {
+	char *spec = spec_map(DATA_T_KEY);
 	SIZE_T i, j;	
+	
 	for (i=0; i<rows; ++i) {
 		for (j=0; j<cols; ++j) {
-			printf(spec_map(DATA_T_KEY), A[i][j]);
+			printf(spec, A[i][j]);
+			printf(delim);
 		}
 		printf("\n");
 	}	
@@ -273,19 +276,19 @@ char *spec_map(char type) {
 	char *spec;
 	switch (type) {
 		case 'd':
-			spec = "%.4lf ";
+			spec = "%.4lf";
 			break;
 	
 		case 'f':
-			spec = "%.4f ";
+			spec = "%.4f";
 			break;
 
 		case 'u':
-			spec = "%u ";
+			spec = "%u";
 			break;
 		
 		case 'i':
-			spec = "%i ";
+			spec = "%i";
 			break;
 	}	
 	return spec;	
