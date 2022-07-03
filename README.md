@@ -2,16 +2,29 @@
 By Ty Ellison (V00) and Lucas Antonsen (V00923982)
 
 ## Project Specifications: 
-The project shall make use of the C programming language and an ARM-based processor to create a QR Decomposition program. QR decomposition is useful in a variety of problems such as the Least Squares Problem and results in a matrix that is easier to use in certain capacities [1]. Our program shall use the Gram-Schmidt Orthogonalization algorithm.
+Our project shall make use of the C programming language and an ARM-based processor to create a QR Decomposition program. QR decomposition is useful in a variety of problems such as the Least Squares Problem and results in a matrix that is easier to use in certain capacities [1]. Our program shall use the Gram-Schmidt Orthogonalization algorithm.
 
 ## Solution Approach:
-QR decomposition is where a matrix, A, is decomposed to an orthogonal matrix, Q, and an upper triangular matrix, R, ($A = QR$). A common method to accomplish QR decomposition is through Gram-Schmidt Orthogonalization (GSO) [2].
+QR decomposition is where a matrix, $A$, is decomposed to an orthogonal matrix, $Q$, and an upper triangular matrix, $R$, ($A = QR$). A common method to accomplish QR decomposition is through Gram-Schmidt Orthogonalization (GSO) [2].
 
-In GSO, the matrix, $A$, is divided into columns: $A = [a_1 | a_2| \cdots | a_n]$. Then, we have u_1 = a_1, e1 = u_1/||u_1||, u2 = a2-(a2xe1)e1, e2 = u_2/||u2||. Uk+1 = ak+1 -(ak+1xe_1)e1-...-(ak_+1xek)ek, ek+1 = uk+1/||uk+1||.
+In GSO, the matrix, $A$, is divided into columns: $A = [a_1 | a_2| \cdots | a_n]$. Then, we have  
+$u_1 = a_1,$  
+$e_1 = u_1/||u_1||,$  
+$u_2 = a_2-(a_2\cdot e_1)e_1,$  
+$e_2 = u_2/||u_2||.$  
+$u_{k+1} = a_{k+1}-(a_{k+1}\cdot e_1)e_1- \cdots -(a_{k+1}\cdot e_k)e_k,$  
+$e_{k+1} = u_{k+1}/||u_{k+1}||$.
 
 Finally,
 
-A = [e1|e2|...|en](see pdf) (put latex in readme)[2].
+$$A = [e_1|e_2|\cdots|e_n] 
+\begin{bmatrix}
+a_{1}\cdot e_1 & a_{2}\cdot e_1 & \cdots & a_{n}\cdot e_1\\
+0 & a_{2}\cdot e_2 & \cdots & a_{n}\cdot e_2\\ 
+\vdots & \vdots & \ddots & \vdots\\ 
+0 & 0 & \cdots & a_{n}\cdot e_n
+\end{bmatrix}
+= QR$$
 
 GSO is the method we will use for our project.
 Work Completed:
