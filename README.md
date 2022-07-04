@@ -98,10 +98,10 @@ void fprintm(char *fname, char *delim, SIZE_T rows, SIZE_T cols, DATA_T A[rows][
 void printm(char *delim, SIZE_T rows, SIZE_T cols, DATA_T A[rows][cols]);
 void printv(SIZE_T size, DATA_T v[size]);
 char *spec_map(char type);
-double l2_norm(SIZE_T size, DATA_T x[size]);
+double l2_norm(SIZE_T size, DATA_T v[size]);
 double sqr_rt(DATA_T x, double eps, double tol, size_t max_iter);
 double abs_val(double x);
-int closest_perfect_square(double x, size_t max_iter);
+int closest_perfect_square(DATA_T x, size_t max_iter);
 void transpose_m(SIZE_T rows, SIZE_T cols, DATA_T A[rows][cols], DATA_T B[cols][rows]);
 void vec_copy(SIZE_T size, DATA_T src[size], DATA_T dest[size]);
 double vec_dot(SIZE_T size, DATA_T v1[size], DATA_T v2[size]);
@@ -112,7 +112,6 @@ void vec_sub(SIZE_T size, DATA_T v1[size], DATA_T v2[size]);
 void QR(
 		SIZE_T rows, 
 		SIZE_T cols, 
-		DATA_T A[rows][cols], 
 		DATA_T At[cols][rows], 
 		DATA_T Q[rows][rows], 
 		DATA_T R[rows][cols]);
@@ -123,11 +122,10 @@ int main(int argc, char *argv[]) {
 	char delim[] = " ";	
 	assert(argc == 5);
 	char *fin = argv[1];
-	char *fout =argv[2];
+	char *fout = argv[2];
 	SIZE_T ROWS = (SIZE_T) strtoull(argv[3], &end, 10);
 	SIZE_T COLS = (SIZE_T) strtoull(argv[4], &end, 10);
 	
-
 	DATA_T A[ROWS][COLS];
 	DATA_T At[COLS][ROWS];
 	DATA_T Q[ROWS][ROWS];
@@ -136,7 +134,7 @@ int main(int argc, char *argv[]) {
 	fscanm(fin, delim, ROWS, COLS, A);	
 	transpose_m(ROWS, COLS, A, At);
 	
-	QR(ROWS, COLS, A, At, Q, R);
+	QR(ROWS, COLS, At, Q, R);
 	
 	fprintm(fout, delim, ROWS, ROWS, Q);
 	fprintm(fout, delim, ROWS, COLS, R);	
@@ -146,7 +144,6 @@ int main(int argc, char *argv[]) {
 void QR(
 		SIZE_T rows, 
 		SIZE_T cols, 
-		DATA_T A[rows][cols], 
 		DATA_T At[cols][rows], 
 		DATA_T Q[rows][rows], 
 		DATA_T R[rows][cols]) {
@@ -162,7 +159,7 @@ void QR(
 		y_norm = l2_norm(rows, y);	
 		vec_div(rows, q, y_norm);
 		
-		for (i=0; i<j-1; ++i) {
+		for (i=0; i<j; ++i) {
 			R[i][j] = vec_dot(rows, q, y);
 			vec_mulc(rows, q, R[i][j]); 
 			vec_sub(rows, q, y);
@@ -230,13 +227,9 @@ void transpose_m(SIZE_T rows, SIZE_T cols, DATA_T A[rows][cols], DATA_T B[cols][
 	}
 }
 
-double l2_norm(SIZE_T size, DATA_T vec[size]) {
-	double res;	
-	SIZE_T i;
-	
-	for (i=0; i<size; ++i) {
-		res += vec[i] * vec[i];
-	}
+double l2_norm(SIZE_T size, DATA_T v[size]) {
+	double res;		
+	res = vec_dot(size, v, v);
 	res = sqr_rt(res, EPSILON, TOLERANCE, MAX_ITER);
 	return res;
 }
@@ -266,7 +259,7 @@ double sqr_rt(DATA_T x, double eps, double tol, size_t max_iter) {
 	return xn;
 }
 
-int closest_perfect_square(double x, size_t max_iter) {
+int closest_perfect_square(DATA_T x, size_t max_iter) {
 	int xn = 0, x0 = 1;
 	size_t i;
 	
@@ -281,7 +274,7 @@ int closest_perfect_square(double x, size_t max_iter) {
 }
 
 double abs_val(double x) {
-	return (unsigned) ((x < 0.)? -x : x);
+	return (double) ((x < 0.) ? -x : x);
 }
 
 void fscanm(char *fname, char *delim, SIZE_T rows, SIZE_T cols, DATA_T A[rows][cols]) {
