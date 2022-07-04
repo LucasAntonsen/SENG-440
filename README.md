@@ -29,37 +29,43 @@ a_{1}\cdot e_1 & a_{2}\cdot e_1 & \cdots & a_{n}\cdot e_1\\
 GSO is the method we will use for our project.
 
 ## Work Completed:
-We have created a C program, GSO, for our interpretation of the Gram-Schmidt Orthogonalization algorithm (see Appendix). The GSO program shall be used as a base for further optimizations.
+We have created a C program, GSO, for our interpretation of the Modified Gram-Schmidt Orthogonalization algorithm (see Appendix). The GSO program shall be used as a base for further optimizations.
 
-In GSO, input is passed via program execution as follows:
+In the current version of GSO (see appendix) input is passed via program execution as follows:
 
 ```./gso.exe file_input rows columns```
 
-```file_input``` is the file containing the input matrix for QR decomposition.  
-```rows``` is the number of rows in the input matrix.  
+```file_input``` is the file containing the input matrix for QR decomposition.
+```rows``` is the number of rows in the input matrix.
 ```columns``` is the number of columns in the input matrix.
 
 From the input, the rows and column sizes are initialized and matrices A, A Transpose, Q and R are initialized based on the row and column sizes.
 
-Using the function ```fscanm```, the file input is read and M is filled with the matrix values. The function ```transpose_m``` then is used to fill A Transpose with the appropriate values based on A.
+Using the function fscanm, the file input is read and A is filled with the matrix values. The function transpose_m then is used to fill A Transpose with the appropriate values based on A.
 
-Next, the function ```QR``` is called which handles the QR decomposition. In QR, the columns of A are iterated through and used to generate u and e, and then the values of R and Q are populated.
+Next, the function ```QR``` is called which handles the QR decomposition. In ```QR```, the columns of A are iterated through and used to generate u and e, and then the values of R and Q are populated.
 
-A variety of functions are used in QR. ```vec_copy``` copies a vector represented as an array to another vector. ```l2_norm``` generates the constant value of a given vector. ```vec_div``` divides a vector by a constant. ```vec_dot``` generates the dot product of two vectors. ```vec_mulc``` multiplies a vector by a constant.
+A variety of functions are used in QR. ```vec_copy``` copies a vector represented as an array to another vector. ```l2_norm``` generates the Euclidean norm of a given vector. ```vec_div``` divides a vector by a constant. ```vec_dot``` generates the dot product of two vectors. ```vec_mulc``` multiplies a vector by a constant.
 
-Additional auxiliary functions include ```sqr_rt```, a function for calculating the square root of a number, which is used by ```l2_norm```. ```sqr_rt``` uses the function closest_perfect_square to ensure that the ```sqr_rt``` function is searching for the value using the closest perfect square root to the given input. ```sqr_rt``` also uses the function ```abs_val```, an absolute value function used in comparisons between values.
+Additional auxiliary functions include ```sqr_rt```, a function for calculating the square root of a number, which is used by ```l2_norm```. The ```sqr_rt``` function utilizes the Newton-Raphson method for approximating a root of a function, in this case the function is the square root of a constant. The Newton-Raphson method requires a sufficiently good initial guess for the root being approximated. The ```closest_perfect_square``` function was created to seed the initial guess for the Newton-Raphson method. ```sqr_rt``` also uses the function ```abs_val``` for calculating the absolute forward error between successive root approximations. 
 
-The function ```fprintm``` prints the matrix from file input. ```spec_map``` is used to select the appropriate formatting for printing various number types. ```printm``` prints matrices, ```printv``` prints vectors and ```openf``` opens files.
+The function ```fprintm``` prints the matrix from file input. ```spec_map``` is used to select the appropriate format specifier for various data types. ```printm``` prints matrices, ```printv``` prints vectors, and ```openf``` opens files and checks to make sure the file was open properly.
+
+## Future Plans
+
+Moving forward, we plan on generating test matrices of various sizes and degrees of precision, measuring the run-time of the QR decomposition over the test suite, measuring the amount of numerical error accumulated for each input matrix in the test suite, using these measurements to decide if we need to make any implementation or algorithmic changes, and then perform C and assembly optimizations. It is important to note that the decomposition was written to allow for non-square real valued input matrices. Since ```sqr_rt``` may return a real number (not strictly an integer), we require the use of fixed or floating point arithmetic. Two potential hardware considerations we have are a) whether or not the specific hardware has a dedicated floating point unit, and b) the mathematical instructions (e.g. FSQRT) available on the specific arm device we use.  We are considering a variety of software optimizations including but not limited to loop unrolling, instruction pipelining, cache efficient data loading, and the use of SIMD operations.
 
 ## Questions
 
-If we use the Gram-Schmidt algorithm rather than the method demonstrated in the SVD project slides will we possibly run into any issues?
+Should we consider other QR decomposition algorithms such as Householder Reflections or Givens Rotations or is the Modified Gram-Schmidt algorithm sufficient?
 
-Does the Gram-Schmidt algorithm have any issues with using fixed-point arithmetic?
+How could ill-conditioned matrices affect the accuracy of our algorithm?
 
-Are we allowed to use any libraries for the project?
+Are we allowed to use any libraries for the project (e.g. standard library for file IO and string operations)?
 
-Should input be hardcoded into the source code?
+How do we determine the memory (including size of different cache levels) and storage requirements of the system?
+
+How could we implement some of our numerical routines (e.g. ```sqr_rt```) as hardware or firmware?
 
 ## References
 [1] B. D. Shaffer, “QR Matrix Factorization,” towardsdatascience.com, Feb. 27, 2020. [Online]. Available: https://towardsdatascience.com/qr-matrix-factorization-15bae43a6b2.  
