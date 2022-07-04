@@ -1,10 +1,10 @@
 # SENG 440 Progress Report: QR Decomposition
-By Ty Ellison (V00) and Lucas Antonsen (V00923982)
+By Ty Ellison (V00916580) and Lucas Antonsen (V00923982)
 
-## Project Specifications: 
+## Project Specifications
 Our project shall make use of the C programming language and an ARM-based processor to create a QR Decomposition program. QR decomposition is useful in a variety of problems such as the Least Squares Problem and results in a matrix that is easier to use in certain capacities [1]. Our program shall use the Gram-Schmidt Orthogonalization algorithm.
 
-## Solution Approach:
+## Solution Approach
 QR decomposition is where a matrix, $A$, is decomposed to an orthogonal matrix, $Q$, and an upper triangular matrix, $R$, ($A = QR$). A common method to accomplish QR decomposition is through Gram-Schmidt Orthogonalization (GSO) [2].
 
 In GSO, the matrix, $A$, is divided into columns: $A = [a_1 | a_2| \cdots | a_n]$. Then, we have  
@@ -28,20 +28,20 @@ a_{1}\cdot e_1 & a_{2}\cdot e_1 & \cdots & a_{n}\cdot e_1\\
 
 GSO is the method we will use for our project.
 
-## Work Completed:
+## Work Completed
 We have created a C program, GSO, for our interpretation of the Modified Gram-Schmidt Orthogonalization algorithm (see Appendix). The GSO program shall be used as a base for further optimizations.
 
 In the current version of GSO (see appendix) input is passed via program execution as follows:
 
 ```./gso.exe file_input rows columns```
 
-```file_input``` is the file containing the input matrix for QR decomposition.
-```rows``` is the number of rows in the input matrix.
+```file_input``` is the file containing the input matrix for QR decomposition.  
+```rows``` is the number of rows in the input matrix.  
 ```columns``` is the number of columns in the input matrix.
 
 From the input, the rows and column sizes are initialized and matrices A, A Transpose, Q and R are initialized based on the row and column sizes.
 
-Using the function fscanm, the file input is read and A is filled with the matrix values. The function transpose_m then is used to fill A Transpose with the appropriate values based on A.
+Using the function ```fscanm```, the file input is read and A is filled with the matrix values. The function ```transpose_m``` then is used to fill A Transpose with the appropriate values based on A.
 
 Next, the function ```QR``` is called which handles the QR decomposition. In ```QR```, the columns of A are iterated through and used to generate u and e, and then the values of R and Q are populated.
 
