@@ -19,7 +19,7 @@ void fprintm(char *fname, char *delim, SIZE_T rows, SIZE_T cols, DATA_T A[rows][
 void printm(char *delim, SIZE_T rows, SIZE_T cols, DATA_T A[rows][cols]);
 void printv(SIZE_T size, DATA_T v[size]);
 char *spec_map(char type);
-double l2_norm(SIZE_T size, DATA_T x[size]);
+double l2_norm(SIZE_T size, DATA_T v[size]);
 double sqr_rt(DATA_T x, double eps, double tol, size_t max_iter);
 double abs_val(double x);
 int closest_perfect_square(DATA_T x, size_t max_iter);
@@ -33,7 +33,6 @@ void vec_sub(SIZE_T size, DATA_T v1[size], DATA_T v2[size]);
 void QR(
 		SIZE_T rows, 
 		SIZE_T cols, 
-		DATA_T A[rows][cols], 
 		DATA_T At[cols][rows], 
 		DATA_T Q[rows][rows], 
 		DATA_T R[rows][cols]);
@@ -56,7 +55,7 @@ int main(int argc, char *argv[]) {
 	fscanm(fin, delim, ROWS, COLS, A);	
 	transpose_m(ROWS, COLS, A, At);
 	
-	QR(ROWS, COLS, A, At, Q, R);
+	QR(ROWS, COLS, At, Q, R);
 	
 	fprintm(fout, delim, ROWS, ROWS, Q);
 	fprintm(fout, delim, ROWS, COLS, R);	
@@ -66,7 +65,6 @@ int main(int argc, char *argv[]) {
 void QR(
 		SIZE_T rows, 
 		SIZE_T cols, 
-		DATA_T A[rows][cols], 
 		DATA_T At[cols][rows], 
 		DATA_T Q[rows][rows], 
 		DATA_T R[rows][cols]) {
@@ -150,13 +148,9 @@ void transpose_m(SIZE_T rows, SIZE_T cols, DATA_T A[rows][cols], DATA_T B[cols][
 	}
 }
 
-double l2_norm(SIZE_T size, DATA_T vec[size]) {
-	double res;	
-	SIZE_T i;
-	
-	for (i=0; i<size; ++i) {
-		res += vec[i] * vec[i];
-	}
+double l2_norm(SIZE_T size, DATA_T v[size]) {
+	double res;		
+	res = vec_dot(size, v, v);
 	res = sqr_rt(res, EPSILON, TOLERANCE, MAX_ITER);
 	return res;
 }
