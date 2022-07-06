@@ -4,7 +4,7 @@
 #include <stdint.h>
 #include <assert.h>
 
-#define SIZE_T uint16_t
+#define SIZE_T uint32_t
 #define DATA_T double
 #define DATA_T_KEY 'd'
 #define NUM_T double
