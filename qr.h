@@ -154,7 +154,7 @@ void vec_copy(SIZE_T size, DATA_T src[size], NUM_T dest[size]) {
 }
 
 NUM_T vec_dot(SIZE_T size, NUM_T v1[size], NUM_T v2[size]) {
-	DATA_T res=0;
+	NUM_T res = 0;
 	SIZE_T i;
 	
 	for (i=0; i<size; ++i) {
@@ -165,14 +165,15 @@ NUM_T vec_dot(SIZE_T size, NUM_T v1[size], NUM_T v2[size]) {
 
 void vec_mulc(SIZE_T size, NUM_T v[size], NUM_T c) {
 	SIZE_T i;
+
 	for (i=0; i<size; ++i) {
 		v[i] *= c;
 	}
 }
 
 void vec_mul(SIZE_T size, NUM_T src[size], NUM_T dest[size]) {
-	SIZE_T i;
-	
+	SIZE_T i;	
+
 	for (i=0; i<size; ++i) {
 		dest[i] *= src[i]; 
 	}	
