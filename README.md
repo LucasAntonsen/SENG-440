@@ -87,34 +87,35 @@ The code for our GSO program is found below.
 #define SIZE_T uint16_t
 #define DATA_T double
 #define DATA_T_KEY 'd'
-#define TOLERANCE 1e-4
-#define EPSILON 1e-10
-#define MAX_ITER 50000
+#define NUM_T double
+#define NUM_T_KEY 'd'
+#define TOLERANCE 1e-14
+#define EPSILON 1e-15
+#define MAX_ITER 46340
 
 
 FILE *openf(char *fname, char *mode);
 void fscanm(char *fname, char *delim, SIZE_T rows, SIZE_T cols, DATA_T A[rows][cols]);
 void fprintm(char *fname, char *delim, SIZE_T rows, SIZE_T cols, DATA_T A[rows][cols]);
+void fprintmt(char *fname, char *delim, SIZE_T rows, SIZE_T cols, NUM_T A[rows][cols]);
 void printm(char *delim, SIZE_T rows, SIZE_T cols, DATA_T A[rows][cols]);
 void printv(SIZE_T size, DATA_T v[size]);
 char *spec_map(char type);
-double l2_norm(SIZE_T size, DATA_T v[size]);
-double sqr_rt(DATA_T x, double eps, double tol, size_t max_iter);
-double abs_val(double x);
+NUM_T l2_norm(SIZE_T size, NUM_T v[size]);
+NUM_T sqr_rt(NUM_T x, NUM_T eps, NUM_T tol, size_t max_iter);
+NUM_T abs_val(NUM_T x);
 int closest_perfect_square(DATA_T x, size_t max_iter);
 void transpose_m(SIZE_T rows, SIZE_T cols, DATA_T A[rows][cols], DATA_T B[cols][rows]);
-void vec_copy(SIZE_T size, DATA_T src[size], DATA_T dest[size]);
-double vec_dot(SIZE_T size, DATA_T v1[size], DATA_T v2[size]);
-void vec_div(SIZE_T size, DATA_T v[size], double divisor);
-void vec_mulc(SIZE_T size, DATA_T v[size], double c);
-void vec_mul(SIZE_T size, DATA_T src[size], DATA_T dest[size]);
-void vec_sub(SIZE_T size, DATA_T v1[size], DATA_T v2[size]);
-void QR(
-		SIZE_T rows, 
-		SIZE_T cols, 
-		DATA_T At[cols][rows], 
-		DATA_T Q[rows][rows], 
-		DATA_T R[rows][cols]);
+void numt_set_col(SIZE_T rows, SIZE_T cols, SIZE_T target_col, NUM_T v[rows], NUM_T A[rows][cols]);
+void mat_set_col(SIZE_T rows, SIZE_T cols, SIZE_T target_col, DATA_T v[rows], DATA_T A[rows][cols]);
+void numt_vec_copy(SIZE_T size, NUM_T src[size], NUM_T dest[size]);
+void vec_copy(SIZE_T size, DATA_T src[size], NUM_T dest[size]);
+NUM_T vec_dot(SIZE_T size, NUM_T v1[size], NUM_T v2[size]);
+void vec_divc(SIZE_T size, NUM_T v[size], NUM_T divisor);
+void vec_mulc(SIZE_T size, NUM_T v[size], NUM_T c);
+void vec_mul(SIZE_T size, NUM_T src[size], NUM_T dest[size]);
+void vec_sub(SIZE_T size, NUM_T v1[size], NUM_T v2[size]);
+void QR(SIZE_T rows, SIZE_T cols, DATA_T At[cols][rows], NUM_T Q[rows][rows], NUM_T R[rows][cols]);
 
 
 int main(int argc, char *argv[]) {
@@ -128,64 +129,136 @@ int main(int argc, char *argv[]) {
 	
 	DATA_T A[ROWS][COLS];
 	DATA_T At[COLS][ROWS];
-	DATA_T Q[ROWS][ROWS];
-	DATA_T R[ROWS][COLS];
+	NUM_T Q[ROWS][ROWS];
+	NUM_T R[ROWS][COLS];
 	
 	fscanm(fin, delim, ROWS, COLS, A);	
 	transpose_m(ROWS, COLS, A, At);
 	
 	QR(ROWS, COLS, At, Q, R);
 	
-	fprintm(fout, delim, ROWS, ROWS, Q);
-	fprintm(fout, delim, ROWS, COLS, R);	
+	fprintmt(fout, delim, ROWS, ROWS, Q);
+	fprintmt(fout, delim, ROWS, COLS, R);	
 	return 0;
 }
 
-void QR(
-		SIZE_T rows, 
-		SIZE_T cols, 
-		DATA_T At[cols][rows], 
-		DATA_T Q[rows][rows], 
-		DATA_T R[rows][cols]) {
-	
+void QR(SIZE_T rows, SIZE_T cols, DATA_T At[cols][rows], NUM_T Q[rows][rows], NUM_T R[rows][cols]) {
 	assert(rows >= cols);
-	DATA_T y[rows], q[rows];
-	double y_norm;
+	NUM_T y[rows], q[rows];
+	NUM_T y_norm;
 	SIZE_T i, j;	
 	
 	for (j=0; j<cols; ++j) {
 		vec_copy(rows, At[j], y);
-		vec_copy(rows, y, q);
-		y_norm = l2_norm(rows, y);	
-		vec_div(rows, q, y_norm);
 		
 		for (i=0; i<j; ++i) {
+			numt_vec_copy(rows, Q[i], q);
+			y_norm = l2_norm(rows, y);	
+			vec_divc(rows, q, y_norm);	
 			R[i][j] = vec_dot(rows, q, y);
 			vec_mulc(rows, q, R[i][j]); 
 			vec_sub(rows, q, y);
 		}
-		R[j][j] = l2_norm(rows, y);
-		vec_div(rows, y, R[j][j]);
-		vec_copy(rows, y, Q[j]);
+		y_norm = l2_norm(rows, y);
+		R[j][j] = y_norm;
+		vec_divc(rows, y, y_norm);
+		numt_set_col(rows, rows, j, y, Q);
 	}
 }
 
-void vec_sub(SIZE_T size, DATA_T v1[size], DATA_T v2[size]) {
+NUM_T l2_norm(SIZE_T size, NUM_T v[size]) {
+	NUM_T res;		
+	res = vec_dot(size, v, v);
+	res = sqr_rt(res, EPSILON, TOLERANCE, MAX_ITER);
+	return res;
+}
+
+NUM_T sqr_rt(NUM_T x, NUM_T eps, NUM_T tol, size_t max_iter) {
+	assert((int)x >= 0);
+	NUM_T x0 = (NUM_T) closest_perfect_square(x, MAX_ITER);
+	NUM_T xn, err;
+	NUM_T f_n, f_prime;
+	size_t i;
+	
+	for (i=0; i<max_iter; ++i) { 
+		f_n = (x0 * x0) - x;
+		f_prime = 2. * x0;
+		
+		if (abs_val(f_prime) < eps) {
+			xn = 0.;
+			break;
+		}
+		
+		xn = x0 - (f_n / f_prime);
+		err = abs_val(xn - x0);
+		if (err <= tol) {
+			break;	
+		}
+		x0 = xn;	
+	}
+	return xn;
+}
+
+int closest_perfect_square(DATA_T x, size_t max_iter) {
+	int sq = 0, xn = 1;
+	size_t i;
+	
+	for (i=0; i<max_iter; ++i) {
+		sq = xn * xn;
+		if (sq > (int)x) {
+			break;
+		}
+		xn += 1;
+	}
+	return xn;
+}
+
+NUM_T abs_val(NUM_T x) {
+	return (NUM_T) ((x < 0.) ? -x : x);
+}
+
+void numt_set_col(SIZE_T rows, SIZE_T cols, SIZE_T target_col, NUM_T v[rows], NUM_T A[rows][cols]) {
+    SIZE_T i;
+
+    for (i=0; i<rows; ++i) {
+        A[i][target_col] = (NUM_T) v[i];
+    }
+}
+
+void mat_set_col(SIZE_T rows, SIZE_T cols, SIZE_T target_col, DATA_T v[rows], DATA_T A[rows][cols]) {
 	SIZE_T i;
+
+	for (i=0; i<rows; ++i) {
+		A[i][target_col] = v[i];
+	}
+}
+
+void vec_sub(SIZE_T size, NUM_T v1[size], NUM_T v2[size]) {
+	SIZE_T i;
+
 	for (i=0; i<size; ++i) {
 		v2[i] -= v1[i];
 	}
 }
 
-void vec_copy(SIZE_T size, DATA_T src[size], DATA_T dest[size]) {
+void numt_vec_copy(SIZE_T size, NUM_T src[size], NUM_T dest[size]) {
 	SIZE_T i;
+
 	for (i=0; i<size; ++i) {
-		dest[i] = src[i];
+		dest[i] = (NUM_T) src[i];
 	}
 }
 
-double vec_dot(SIZE_T size, DATA_T v1[size], DATA_T v2[size]) {
-	DATA_T res=0;
+void vec_copy(SIZE_T size, DATA_T src[size], NUM_T dest[size]) {
+    SIZE_T i;
+
+    for (i=0; i<size; ++i) {
+        dest[i] = (NUM_T) src[i];
+    }
+}
+
+NUM_T vec_dot(SIZE_T size, NUM_T v1[size], NUM_T v2[size]) {
+	NUM_T res = 0;
 	SIZE_T i;
 	
 	for (i=0; i<size; ++i) {
@@ -194,22 +267,23 @@ double vec_dot(SIZE_T size, DATA_T v1[size], DATA_T v2[size]) {
 	return res;
 }
 
-void vec_mulc(SIZE_T size, DATA_T v[size], double c) {
+void vec_mulc(SIZE_T size, NUM_T v[size], NUM_T c) {
 	SIZE_T i;
+
 	for (i=0; i<size; ++i) {
 		v[i] *= c;
 	}
 }
 
-void vec_mul(SIZE_T size, DATA_T src[size], DATA_T dest[size]) {
-	SIZE_T i;
-	
+void vec_mul(SIZE_T size, NUM_T src[size], NUM_T dest[size]) {
+	SIZE_T i;	
+
 	for (i=0; i<size; ++i) {
 		dest[i] *= src[i]; 
 	}	
 }
 
-void vec_div(SIZE_T size, DATA_T v[size], double divisor) {
+void vec_divc(SIZE_T size, NUM_T v[size], NUM_T divisor) {
 	assert(divisor > EPSILON);	
 	SIZE_T i;
 	
@@ -225,56 +299,6 @@ void transpose_m(SIZE_T rows, SIZE_T cols, DATA_T A[rows][cols], DATA_T B[cols][
 			B[i][j] = A[j][i];
 		}
 	}
-}
-
-double l2_norm(SIZE_T size, DATA_T v[size]) {
-	double res;		
-	res = vec_dot(size, v, v);
-	res = sqr_rt(res, EPSILON, TOLERANCE, MAX_ITER);
-	return res;
-}
-
-double sqr_rt(DATA_T x, double eps, double tol, size_t max_iter) {
-	double x0 = closest_perfect_square(x, MAX_ITER);
-	double xn;
-	double f_n, f_prime;
-	size_t i;
-	
-	for (i=0; i<max_iter; ++i) { 
-		f_n = (x0 * x0) - (double)x;
-		f_prime = 2. * x0;
-		
-		if (abs_val(f_prime) < eps) {
-			xn = 0.;
-			break;
-		}
-		
-		xn = x0 - (f_n / f_prime);
-		
-		if (abs_val(xn - x0) <= tol) {
-			break;	
-		}
-		x0 = xn;	
-	}
-	return xn;
-}
-
-int closest_perfect_square(DATA_T x, size_t max_iter) {
-	int xn = 0, x0 = 1;
-	size_t i;
-	
-	for (i=0; i<max_iter; ++i) {
-		xn = x0 * x0;
-		if (xn > (int)x) {
-			break;
-		}
-		x0 += 1;
-	}
-	return x0;
-}
-
-double abs_val(double x) {
-	return (double) ((x < 0.) ? -x : x);
 }
 
 void fscanm(char *fname, char *delim, SIZE_T rows, SIZE_T cols, DATA_T A[rows][cols]) {
@@ -295,6 +319,22 @@ void fscanm(char *fname, char *delim, SIZE_T rows, SIZE_T cols, DATA_T A[rows][c
 		}
 	}
 	fclose(fptr);	
+}
+
+void fprintmt(char *fname, char *delim, SIZE_T rows, SIZE_T cols, NUM_T A[rows][cols]) {
+	FILE *fptr = openf(fname, "a");
+	char *spec = spec_map(NUM_T_KEY);
+	SIZE_T i, j;
+	
+	for (i=0; i<rows; ++i) {
+		for (j=0; j<cols; ++j) {
+			fprintf(fptr, spec, A[i][j]);
+			fprintf(fptr, delim);
+		}
+		fprintf(fptr, "\n");
+	}
+	fprintf(fptr, "\n");	
+	fclose(fptr);
 }
 
 void fprintm(char *fname, char *delim, SIZE_T rows, SIZE_T cols, DATA_T A[rows][cols]) {
@@ -350,11 +390,11 @@ char *spec_map(char type) {
 	char *spec;
 	switch (type) {
 		case 'd':
-			spec = "%.4lf";
+			spec = "%.8lf";
 			break;
 	
 		case 'f':
-			spec = "%.4f";
+			spec = "%.8f";
 			break;
 
 		case 'u':
