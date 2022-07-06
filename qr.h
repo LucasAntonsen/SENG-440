@@ -9,8 +9,8 @@
 #define DATA_T_KEY 'd'
 #define NUM_T double
 #define NUM_T_KEY 'd'
-#define TOLERANCE 1e-4
-#define EPSILON 1e-10
+#define TOLERANCE 1e-14
+#define EPSILON 1e-15
 #define MAX_ITER 50000
 
 
@@ -286,11 +286,11 @@ char *spec_map(char type) {
 	char *spec;
 	switch (type) {
 		case 'd':
-			spec = "%.4lf";
+			spec = "%.8lf";
 			break;
 	
 		case 'f':
-			spec = "%.4f";
+			spec = "%.8f";
 			break;
 
 		case 'u':
