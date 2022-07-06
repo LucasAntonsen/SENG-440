@@ -4,10 +4,11 @@
 #include <stdint.h>
 #include <assert.h>
 
-#define NUM_T float
 #define SIZE_T uint16_t
 #define DATA_T double
 #define DATA_T_KEY 'd'
+#define NUM_T double
+#define NUM_T_KEY 'd'
 #define TOLERANCE 1e-4
 #define EPSILON 1e-10
 #define MAX_ITER 50000
@@ -82,7 +83,7 @@ void QR(
 		vec_copy(rows, At[j], y);
 		
 		for (i=0; i<j; ++i) {
-			numt_vec_copy(rows, y, q);
+			numt_vec_copy(rows, Q[i], q);
 			y_norm = l2_norm(rows, y);	
 			vec_divc(rows, q, y_norm);	
 			R[i][j] = vec_dot(rows, q, y);
@@ -92,7 +93,7 @@ void QR(
 		y_norm = l2_norm(rows, y);
 		R[j][j] = y_norm;
 		vec_divc(rows, y, y_norm);
-		numt_set_col(rows, rows, j, y, &Q[j]);
+		numt_set_col(rows, rows, j, y, Q);
 	}
 }
 
@@ -252,7 +253,7 @@ void fscanm(char *fname, char *delim, SIZE_T rows, SIZE_T cols, DATA_T A[rows][c
 
 void fprintmt(char *fname, char *delim, SIZE_T rows, SIZE_T cols, NUM_T A[rows][cols]) {
 	FILE *fptr = openf(fname, "a");
-	char *spec = spec_map(DATA_T_KEY);
+	char *spec = spec_map(NUM_T_KEY);
 	SIZE_T i, j;
 	
 	for (i=0; i<rows; ++i) {
