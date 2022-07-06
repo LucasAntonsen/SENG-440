@@ -11,7 +11,7 @@
 #define NUM_T_KEY 'd'
 #define TOLERANCE 1e-14
 #define EPSILON 1e-15
-#define MAX_ITER 50000
+#define MAX_ITER 46340
 
 
 FILE *openf(char *fname, char *mode);
