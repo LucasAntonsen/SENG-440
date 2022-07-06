@@ -35,20 +35,10 @@ void vec_divc(SIZE_T size, NUM_T v[size], NUM_T divisor);
 void vec_mulc(SIZE_T size, NUM_T v[size], NUM_T c);
 void vec_mul(SIZE_T size, NUM_T src[size], NUM_T dest[size]);
 void vec_sub(SIZE_T size, NUM_T v1[size], NUM_T v2[size]);
-void QR(
-		SIZE_T rows, 
-		SIZE_T cols, 
-		DATA_T At[cols][rows], 
-		NUM_T Q[rows][rows], 
-		NUM_T R[rows][cols]);
+void QR(SIZE_T rows, SIZE_T cols, DATA_T At[cols][rows], NUM_T Q[rows][rows], NUM_T R[rows][cols]);
 
-void QR(
-		SIZE_T rows, 
-		SIZE_T cols, 
-		DATA_T At[cols][rows], 
-		NUM_T Q[rows][rows], 
-		NUM_T R[rows][cols]) {
-	
+
+void QR(SIZE_T rows, SIZE_T cols, DATA_T At[cols][rows], NUM_T Q[rows][rows], NUM_T R[rows][cols]) {
 	assert(rows >= cols);
 	NUM_T y[rows], q[rows];
 	NUM_T y_norm;
