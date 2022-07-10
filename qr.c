@@ -23,9 +23,12 @@ int main(int argc, char *argv[]) {
 	fscanm(fin, delim, ROWS, COLS, A);	
 	transpose_m(ROWS, COLS, A, At);
 	
-	QR(ROWS, COLS, At, Q, R);
+	QR2(ROWS, COLS, At, Q, R);
 	
 	fprintmt(fout, delim, ROWS, ROWS, Q);
-	fprintmt(fout, delim, ROWS, COLS, R);	
+	fprintmt(fout, delim, ROWS, COLS, R);
+
+	// printf("%lf", sqr_rt(9.0/11.0, EPSILON, TOLERANCE, MAX_ITER));
+	// printf("%lf", sqr_rt(66, EPSILON, TOLERANCE, MAX_ITER));	
 	return 0;
 }

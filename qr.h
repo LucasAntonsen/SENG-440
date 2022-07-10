@@ -36,6 +36,7 @@ void vec_mulc(SIZE_T size, NUM_T v[size], NUM_T c);
 void vec_mul(SIZE_T size, NUM_T src[size], NUM_T dest[size]);
 void vec_sub(SIZE_T size, NUM_T v1[size], NUM_T v2[size]);
 void QR(SIZE_T rows, SIZE_T cols, DATA_T At[cols][rows], NUM_T Q[rows][rows], NUM_T R[rows][cols]);
+void col_to_vec(SIZE_T rows, SIZE_T cols, SIZE_T target_col, DATA_T A[rows][cols], NUM_T dest[rows]);
 
 
 void QR(SIZE_T rows, SIZE_T cols, DATA_T At[cols][rows], NUM_T Q[rows][rows], NUM_T R[rows][cols]) {
@@ -59,6 +60,49 @@ void QR(SIZE_T rows, SIZE_T cols, DATA_T At[cols][rows], NUM_T Q[rows][rows], NU
 		R[j][j] = y_norm;
 		vec_divc(rows, y, y_norm);
 		numt_set_col(rows, rows, j, y, Q);
+	}
+}
+
+//by lucas
+void QR2(SIZE_T rows, SIZE_T cols, DATA_T At[cols][rows], NUM_T Q[rows][rows], NUM_T R[rows][cols]) {
+	assert(rows >= cols);
+	NUM_T u[rows], a[rows], e[rows];
+	NUM_T u_norm;
+	SIZE_T i, j;
+	NUM_T ae_e;
+
+
+	for (j=0; j<cols; ++j) {
+		//get ai
+		vec_copy(rows, At[j], u);
+		printv(3,u);
+		printf("\n");
+		vec_copy(rows, At[j], a);
+		printv(3,a);
+		printf("\n");
+
+		for (i=0; i<j; ++i) {
+			char delim[] = " ";
+			printm(delim, rows, cols, Q);
+			printf("\n");
+			col_to_vec(rows, cols, i, Q, e);
+			printv(3,e);
+			printf("\n");
+			ae_e = vec_dot(rows, a, e);
+			printf("%lf\n", ae_e);
+			vec_mulc(rows, e, ae_e);
+			printv(3,e);
+			printf("\n");
+			vec_sub(rows, e, u);
+			printv(3,u);
+			printf("\n");
+		}
+		u_norm = l2_norm(rows, u);
+		printf("%lf\n", u_norm);
+		vec_divc(rows, u, u_norm);
+		printv(3,u);
+		printf("\n");
+		numt_set_col(rows, rows, j, u, Q);
 	}
 }
 
@@ -143,6 +187,14 @@ void numt_vec_copy(SIZE_T size, NUM_T src[size], NUM_T dest[size]) {
 	for (i=0; i<size; ++i) {
 		dest[i] = (NUM_T) src[i];
 	}
+}
+
+void col_to_vec(SIZE_T rows, SIZE_T cols, SIZE_T target_col, DATA_T A[rows][cols], NUM_T dest[rows]) {
+	SIZE_T i;
+
+	for (i=0; i<rows; ++i) {
+        dest[i] = (NUM_T) A[i][target_col];
+    }
 }
 
 void vec_copy(SIZE_T size, DATA_T src[size], NUM_T dest[size]) {
