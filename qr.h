@@ -47,42 +47,17 @@ void QR(SIZE_T rows, SIZE_T cols, DATA_T At[cols][rows], NUM_T Q[rows][rows], NU
 	
 	for (j=0; j<cols; ++j) {
 		vec_copy(rows, At[j], y);
-		printf("y:\n");
-		printv(3,y);
-		printf("\n");
 		
 		for (i=0; i<j; ++i) {
 			numt_copy_col(rows, cols, i, Q, q);
-			printf("q inner loop:\n");
-			printv(3,q);
-			printf("\ny_norm inner loop:\n");
-			//y_norm = l2_norm(rows, y);
-			//printf("%lf\n\nq inner loop after div:\n", y_norm);
-			//vec_divc(rows, q, y_norm);	
-			//printv(3,q);
-			printf("\nR inner loop dot prod:\n");
 			R[i][j] = vec_dot(rows, q, y);
-			printm(" ", 3, 3, R);
-			printf("\nq inner loop after mulc:\n");
 			vec_mulc(rows, q, R[i][j]);
-			printv(3,q);
-			printf("\ny after inner loop sub:\n"); 
 			vec_sub(rows, q, y);
-			printv(3,y);
-			printf("\n");
 		}
 		y_norm = l2_norm(rows, y);
-		printf("y_norm outer loop:\n%lf\n", y_norm);
-		printf("\nR outer loop:\n");
 		R[j][j] = y_norm;
-		printm(" ", 3, 3, R);
 		vec_divc(rows, y, y_norm);
-		printf("\ny after div by y_norm outer loop:\n");
-		printv(3,y);
-		printf("\nQ after setting columns:\n");
 		numt_set_col(rows, rows, j, y, Q);
-		printm(" ", 3, 3, Q);
-		printf("\n");
 	}
 }
 
