@@ -49,8 +49,8 @@ void QR(SIZE_T rows, SIZE_T cols, DATA_T At[cols][rows], NUM_T Q[rows][rows], NU
 		
 		for (i=0; i<j; ++i) {
 			numt_vec_copy(rows, Q[i], q);
-			y_norm = l2_norm(rows, y);	
-			vec_divc(rows, q, y_norm);	
+			//y_norm = l2_norm(rows, y);	
+			//vec_divc(rows, q, y_norm);	
 			R[i][j] = vec_dot(rows, q, y);
 			vec_mulc(rows, q, R[i][j]); 
 			vec_sub(rows, q, y);
