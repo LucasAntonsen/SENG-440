@@ -39,6 +39,7 @@ void QR(SIZE_T rows, SIZE_T cols, DATA_T At[cols][rows], NUM_T Q[rows][rows], NU
 void numt_copy_col(SIZE_T rows, SIZE_T cols, SIZE_T target_col, NUM_T src[rows][cols], NUM_T dest[rows]);
 
 
+//can do software pipelining here...
 void QR(SIZE_T rows, SIZE_T cols, DATA_T At[cols][rows], NUM_T Q[rows][rows], NUM_T R[rows][cols]) {
 	assert(rows >= cols);
 	NUM_T y[rows], q[rows];
@@ -68,6 +69,7 @@ NUM_T l2_norm(SIZE_T size, NUM_T v[size]) {
 	return res;
 }
 
+//can do software pipelining here...
 NUM_T sqr_rt(NUM_T x, NUM_T eps, NUM_T tol, size_t max_iter) {
 	assert((int)x >= 0);
 	NUM_T x0 = (NUM_T) closest_perfect_square(x, MAX_ITER);
@@ -94,11 +96,12 @@ NUM_T sqr_rt(NUM_T x, NUM_T eps, NUM_T tol, size_t max_iter) {
 	return xn;
 }
 
+//can do software pipelining here...
 int closest_perfect_square(DATA_T x, size_t max_iter) {
 	int sq = 0, xn = 1;
 	size_t i;
-	
-	for (i=0; i<max_iter; ++i) {
+
+	for (i=0; i<max_iter-1; ++i) {
 		sq = xn * xn;
 		if (sq > (int)x) {
 			break;
@@ -188,9 +191,11 @@ void vec_mul(SIZE_T size, NUM_T src[size], NUM_T dest[size]) {
 void vec_divc(SIZE_T size, NUM_T v[size], NUM_T divisor) {
 	assert(divisor > EPSILON);	
 	SIZE_T i;
+
+	NUM_T div = 1/divisor;	//optimization
 	
 	for (i=0; i<size; ++i) {
-		v[i] /= divisor;
+		v[i] *= div;
 	}	
 }
 
@@ -203,6 +208,7 @@ void transpose_m(SIZE_T rows, SIZE_T cols, DATA_T A[rows][cols], DATA_T B[cols][
 	}
 }
 
+//can do software pipelining here...
 void fscanm(char *fname, char *delim, SIZE_T rows, SIZE_T cols, DATA_T A[rows][cols]) {
 	FILE *fptr = openf(fname, "r");	
 	SIZE_T line_size = 0;
@@ -210,11 +216,12 @@ void fscanm(char *fname, char *delim, SIZE_T rows, SIZE_T cols, DATA_T A[rows][c
 	char line[line_size]; 
 	char *tok;
 	char *end;
-	SIZE_T i, j;	
+	SIZE_T i, j;
 	
 	for (i=0; i<rows; ++i) {
 		fgets(line, sizeof(line), fptr);
 		tok = strtok(line, delim);
+		
 		for (j=0; j<cols; ++j) {
 			A[i][j] = (DATA_T) strtod(tok, &end);
 			tok = strtok(NULL, delim);
