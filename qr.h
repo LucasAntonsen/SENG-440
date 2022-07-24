@@ -101,7 +101,7 @@ int closest_perfect_square(DATA_T x, size_t max_iter) {
 	int sq = 0, xn = 1;
 	size_t i;
 
-	for (i=0; i<max_iter-1; ++i) {
+	for (i=0; i<max_iter; ++i) {
 		sq = xn * xn;
 		if (sq > (int)x) {
 			break;
