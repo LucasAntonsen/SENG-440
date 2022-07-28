@@ -97,11 +97,18 @@ NUM_T sqr_rt(NUM_T x, NUM_T eps, NUM_T tol, size_t max_iter) {
 }
 
 //can do software pipelining here...
+//loop unrolling done
 int closest_perfect_square(DATA_T x, size_t max_iter) {
 	int sq = 0, xn = 1;
 	size_t i;
 
-	for (i=0; i<max_iter; ++i) {
+	for (i=0; i<max_iter; i+=2) {
+		sq = xn * xn;
+		if (sq > (int)x) {
+			break;
+		}
+		xn += 1;
+
 		sq = xn * xn;
 		if (sq > (int)x) {
 			break;
@@ -115,95 +122,159 @@ NUM_T abs_val(NUM_T x) {
 	return (NUM_T) ((x < 0.) ? -x : x);
 }
 
+//loop unrolling done
 void numt_copy_col(SIZE_T rows, SIZE_T cols, SIZE_T target_col, NUM_T src[rows][cols], NUM_T dest[rows]) {
 	SIZE_T i;
-	for (i=0; i<rows; ++i) {
+	for (i=0; i<rows; i+=2) {
 		dest[i] = src[i][target_col];
+
+		if(i+1 != rows){
+			dest[i+1] = src[i+1][target_col];
+		}
 	}
 }
 
+//loop unrolling done
 void numt_set_col(SIZE_T rows, SIZE_T cols, SIZE_T target_col, NUM_T v[rows], NUM_T A[rows][cols]) {
     SIZE_T i;
 
-    for (i=0; i<rows; ++i) {
+    for (i=0; i<rows; i+=2) {
         A[i][target_col] = (NUM_T) v[i];
+
+		if(i+1 != rows){
+			A[i+1][target_col] = (NUM_T) v[i+1];
+		}
     }
 }
 
+//loop unrolling done
 void mat_set_col(SIZE_T rows, SIZE_T cols, SIZE_T target_col, DATA_T v[rows], DATA_T A[rows][cols]) {
 	SIZE_T i;
 
-	for (i=0; i<rows; ++i) {
+	// for (i=0; i<rows; ++i) {
+	// 	A[i][target_col] = v[i];
+	// }
+	for(i=0; i<rows; i+=2){
 		A[i][target_col] = v[i];
+
+		if(i+1 != rows){
+			A[i+1][target_col] = v[i+1];
+		}
 	}
 }
 
+//loop unrolling done
 void vec_sub(SIZE_T size, NUM_T v1[size], NUM_T v2[size]) {
 	SIZE_T i;
 
-	for (i=0; i<size; ++i) {
+	// for (i=0; i<size; ++i) {
+	// 	v2[i] -= v1[i];
+	// }
+	for(i=0; i<size; i+=2){
 		v2[i] -= v1[i];
+
+		if(i+1 != size){
+			v2[i+1] -= v1[i+1];
+		}
 	}
 }
 
+//loop unrolling done
 void numt_vec_copy(SIZE_T size, NUM_T src[size], NUM_T dest[size]) {
 	SIZE_T i;
 
-	for (i=0; i<size; ++i) {
+	// for (i=0; i<size; ++i) {
+	// 	dest[i] = (NUM_T) src[i];
+	// }
+	for(i=0; i<size; i+=2){
 		dest[i] = (NUM_T) src[i];
+
+		if(i+1 != size){
+			dest[i+1] = (NUM_T) src[i+1];;
+		}
 	}
 }
 
+//loop unrolling done
 void vec_copy(SIZE_T size, DATA_T src[size], NUM_T dest[size]) {
     SIZE_T i;
 
-    for (i=0; i<size; ++i) {
+    for (i=0; i<size; i+=2) {
         dest[i] = (NUM_T) src[i];
+
+		if(i+1 != size){
+			dest[i+1] = (NUM_T) src[i+1];
+		}
     }
 }
 
+//loop unrolling done
 NUM_T vec_dot(SIZE_T size, NUM_T v1[size], NUM_T v2[size]) {
 	NUM_T res = 0;
 	SIZE_T i;
 	
-	for (i=0; i<size; ++i) {
+	for (i=0; i<size; i+=2) {
 		res += (v1[i] * v2[i]);
+
+		if(i+1 != size){
+			res += (v1[i+1] * v2[i+1]);
+		}
 	}
 	return res;
 }
 
+//loop unrolling done
 void vec_mulc(SIZE_T size, NUM_T v[size], NUM_T c) {
 	SIZE_T i;
 
-	for (i=0; i<size; ++i) {
+	for (i=0; i<size; i+=2) {
 		v[i] *= c;
+
+		if(i+1 != size){
+			v[i+1] *= c;
+		}
 	}
 }
 
+//loop unrolling done
 void vec_mul(SIZE_T size, NUM_T src[size], NUM_T dest[size]) {
 	SIZE_T i;	
 
-	for (i=0; i<size; ++i) {
-		dest[i] *= src[i]; 
+	for (i=0; i<size; i+=2) {
+		dest[i] *= src[i];
+
+		if(i+1 != size){
+			dest[i+1] *= src[i+1];
+		}
 	}	
 }
 
+//loop unrolling done
 void vec_divc(SIZE_T size, NUM_T v[size], NUM_T divisor) {
 	assert(divisor > EPSILON);	
 	SIZE_T i;
 
 	NUM_T div = 1/divisor;	//optimization
 	
-	for (i=0; i<size; ++i) {
+	for (i=0; i<size; i+=2) {
 		v[i] *= div;
+
+		if(i+1 != size){
+			v[i+1] *= div;
+		}
 	}	
 }
 
+//loop unrolling done
 void transpose_m(SIZE_T rows, SIZE_T cols, DATA_T A[rows][cols], DATA_T B[cols][rows]) {
 	SIZE_T i, j;
 	for (i=0; i<cols; ++i) {
-		for (j=0; j<rows; ++j) {
+		for (j=0; j<rows; j+=2) {
 			B[i][j] = A[j][i];
+
+			if(j+1 != rows){
+				B[i][j+1] = A[j+1][i];
+			}
 		}
 	}
 }
@@ -236,9 +307,14 @@ void fprintmt(char *fname, char *delim, SIZE_T rows, SIZE_T cols, NUM_T A[rows][
 	SIZE_T i, j;
 	
 	for (i=0; i<rows; ++i) {
-		for (j=0; j<cols; ++j) {
+		for (j=0; j<cols; j+=2) {
 			fprintf(fptr, spec, A[i][j]);
 			fprintf(fptr, delim);
+
+			if(j+1 != cols){
+				fprintf(fptr, spec, A[i][j+1]);
+				fprintf(fptr, delim);
+			}
 		}
 		fprintf(fptr, "\n");
 	}
@@ -246,15 +322,21 @@ void fprintmt(char *fname, char *delim, SIZE_T rows, SIZE_T cols, NUM_T A[rows][
 	fclose(fptr);
 }
 
+//debugging function
 void fprintm(char *fname, char *delim, SIZE_T rows, SIZE_T cols, DATA_T A[rows][cols]) {
 	FILE *fptr = openf(fname, "a");
 	char *spec = spec_map(DATA_T_KEY);
 	SIZE_T i, j;
 	
 	for (i=0; i<rows; ++i) {
-		for (j=0; j<cols; ++j) {
+		for (j=0; j<cols; j+=2) {
 			fprintf(fptr, spec, A[i][j]);
 			fprintf(fptr, delim);
+
+			if(j+1 != cols){
+				fprintf(fptr, spec, A[i][j+1]);
+				fprintf(fptr, delim);
+			}
 		}
 		fprintf(fptr, "\n");
 	}
@@ -262,19 +344,26 @@ void fprintm(char *fname, char *delim, SIZE_T rows, SIZE_T cols, DATA_T A[rows][
 	fclose(fptr);
 }
 
+//debugging function
 void printm(char *delim, SIZE_T rows, SIZE_T cols, DATA_T A[rows][cols]) {
 	char *spec = spec_map(DATA_T_KEY);
 	SIZE_T i, j;	
 	
 	for (i=0; i<rows; ++i) {
-		for (j=0; j<cols; ++j) {
+		for (j=0; j<cols; j+=2) {
 			printf(spec, A[i][j]);
 			printf(delim);
+
+			if(j+1 != cols){
+				printf(spec, A[i][j+1]);
+				printf(delim);
+			}
 		}
 		printf("\n");
 	}	
 }
 
+//debugging function
 void printv(SIZE_T size, DATA_T v[size]) {
 	char *spec = spec_map(DATA_T_KEY);
 	SIZE_T i;
