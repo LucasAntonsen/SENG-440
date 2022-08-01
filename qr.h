@@ -37,9 +37,9 @@ void vec_mul(SIZE_T size, NUM_T src[size], NUM_T dest[size]);
 void vec_sub(SIZE_T size, NUM_T v1[size], NUM_T v2[size]);
 void QR(SIZE_T rows, SIZE_T cols, DATA_T At[cols][rows], NUM_T Q[rows][rows], NUM_T R[rows][cols]);
 void numt_copy_col(SIZE_T rows, SIZE_T cols, SIZE_T target_col, NUM_T src[rows][cols], NUM_T dest[rows]);
+void zero_m(SIZE_T rows, SIZE_T cols, DATA_T M[rows][cols]);
 
 
-//can do software pipelining here...
 void QR(SIZE_T rows, SIZE_T cols, DATA_T At[cols][rows], NUM_T Q[rows][rows], NUM_T R[rows][cols]) {
 	assert(rows >= cols);
 	NUM_T y[rows], q[rows];
@@ -69,7 +69,6 @@ NUM_T l2_norm(SIZE_T size, NUM_T v[size]) {
 	return res;
 }
 
-//can do software pipelining here...
 NUM_T sqr_rt(NUM_T x, NUM_T eps, NUM_T tol, size_t max_iter) {
 	assert((int)x >= 0);
 	NUM_T x0 = (NUM_T) closest_perfect_square(x, MAX_ITER);
@@ -96,7 +95,6 @@ NUM_T sqr_rt(NUM_T x, NUM_T eps, NUM_T tol, size_t max_iter) {
 	return xn;
 }
 
-//can do software pipelining here...
 //loop unrolling done
 int closest_perfect_square(DATA_T x, size_t max_iter) {
 	int sq = 0, xn = 1;
@@ -151,9 +149,6 @@ void numt_set_col(SIZE_T rows, SIZE_T cols, SIZE_T target_col, NUM_T v[rows], NU
 void mat_set_col(SIZE_T rows, SIZE_T cols, SIZE_T target_col, DATA_T v[rows], DATA_T A[rows][cols]) {
 	SIZE_T i;
 
-	// for (i=0; i<rows; ++i) {
-	// 	A[i][target_col] = v[i];
-	// }
 	for(i=0; i<rows; i+=2){
 		A[i][target_col] = v[i];
 
@@ -167,9 +162,6 @@ void mat_set_col(SIZE_T rows, SIZE_T cols, SIZE_T target_col, DATA_T v[rows], DA
 void vec_sub(SIZE_T size, NUM_T v1[size], NUM_T v2[size]) {
 	SIZE_T i;
 
-	// for (i=0; i<size; ++i) {
-	// 	v2[i] -= v1[i];
-	// }
 	for(i=0; i<size; i+=2){
 		v2[i] -= v1[i];
 
@@ -183,9 +175,6 @@ void vec_sub(SIZE_T size, NUM_T v1[size], NUM_T v2[size]) {
 void numt_vec_copy(SIZE_T size, NUM_T src[size], NUM_T dest[size]) {
 	SIZE_T i;
 
-	// for (i=0; i<size; ++i) {
-	// 	dest[i] = (NUM_T) src[i];
-	// }
 	for(i=0; i<size; i+=2){
 		dest[i] = (NUM_T) src[i];
 
@@ -279,7 +268,6 @@ void transpose_m(SIZE_T rows, SIZE_T cols, DATA_T A[rows][cols], DATA_T B[cols][
 	}
 }
 
-//can do software pipelining here...
 void fscanm(char *fname, char *delim, SIZE_T rows, SIZE_T cols, DATA_T A[rows][cols]) {
 	FILE *fptr = openf(fname, "r");	
 	SIZE_T line_size = 0;
@@ -404,4 +392,19 @@ char *spec_map(char type) {
 			break;
 	}	
 	return spec;	
+}
+
+//loop unrolling done
+void zero_m(SIZE_T rows, SIZE_T cols, DATA_T M[rows][cols]){
+	SIZE_T i, j;
+
+	for(i = 0; i < rows; i++){
+		for(j = 0; j < cols; j+=2){
+			M[i][j] = 0;
+
+			if(j+1 != cols){
+				M[i][j+1] = 0;
+			}
+		}
+	}
 }
