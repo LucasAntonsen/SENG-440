@@ -4,9 +4,12 @@
 #include <stdint.h>
 #include <assert.h>
 #include "qr.h"
+#include <time.h>
 
 
 int main(int argc, char *argv[]) {
+	clock_t start, finish;
+
 	char *end;
 	char delim[] = " ";	
 	assert(argc == 5);
@@ -19,13 +22,32 @@ int main(int argc, char *argv[]) {
 	DATA_T At[COLS][ROWS];
 	NUM_T Q[ROWS][ROWS];
 	NUM_T R[ROWS][COLS];
+
+	SIZE_T i;
+	double time_taken = 0;
+
+	for(i = 0; i < 10000; i++){
+		start = clock();
+
+		zero_m(ROWS, COLS, A);
+		zero_m(COLS, ROWS, At);
+		zero_m(ROWS, ROWS, Q);
+		zero_m(ROWS, COLS, R);
+		
+		fscanm(fin, delim, ROWS, COLS, A);	
+		transpose_m(ROWS, COLS, A, At, 0, ROWS, 0, COLS);
+		
+		QR(ROWS, COLS, At, Q, R);
+		
+		fprintmt(fout, delim, ROWS, ROWS, Q);
+		fprintmt(fout, delim, ROWS, COLS, R);	
+
+		finish = clock();
 	
-	fscanm(fin, delim, ROWS, COLS, A);	
-	transpose_m(ROWS, COLS, A, At);
-	
-	QR(ROWS, COLS, At, Q, R);
-	
-	fprintmt(fout, delim, ROWS, ROWS, Q);
-	fprintmt(fout, delim, ROWS, COLS, R);	
+		// Calculating total time taken by the program.
+		time_taken += ((float) (finish - start)) / CLOCKS_PER_SEC;
+	}
+	printf ("Total time = %lf seconds\n", time_taken/10000.0);
+
 	return 0;
 }
