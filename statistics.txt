@@ -1,0 +1,20 @@
+before loop unrolling:
+./qr m20x20.txt output20x20.txt 20 20
+Total time = 0.003885 seconds
+
+after loop unrolling:
+./qr m20x20.txt output20x20.txt 20 20
+Total time = 0.003865 seconds
+
+before for loop optimization:
+./qr m20x20.txt output20x20.txt 20 20
+Total time = 0.003869 seconds
+
+after for loop optimization:
+./qr m20x20.txt output20x20.txt 20 20
+Total time = 0.003891 seconds
+
+before cache efficient matrix transpose:
+
+
+after cache efficient matrix transpose:
