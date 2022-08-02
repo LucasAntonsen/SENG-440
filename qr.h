@@ -25,7 +25,7 @@ NUM_T l2_norm(SIZE_T size, NUM_T v[size]);
 NUM_T sqr_rt(NUM_T x, NUM_T eps, NUM_T tol, size_t max_iter);
 NUM_T abs_val(NUM_T x);
 int closest_perfect_square(DATA_T x, size_t max_iter);
-void transpose_m(SIZE_T rows, SIZE_T cols, DATA_T A[rows][cols], DATA_T B[cols][rows]);
+void transpose_m(SIZE_T rows, SIZE_T cols, DATA_T A[rows][cols], DATA_T B[cols][rows], SIZE_T start_i, SIZE_T end_i, SIZE_T start_j, SIZE_T end_j);
 void numt_set_col(SIZE_T rows, SIZE_T cols, SIZE_T target_col, NUM_T v[rows], NUM_T A[rows][cols]);
 void mat_set_col(SIZE_T rows, SIZE_T cols, SIZE_T target_col, DATA_T v[rows], DATA_T A[rows][cols]);
 void numt_vec_copy(SIZE_T size, NUM_T src[size], NUM_T dest[size]);
@@ -258,17 +258,25 @@ void vec_divc(SIZE_T size, NUM_T v[size], NUM_T divisor) {
 	}	
 }
 
-//loop unrolling done
-void transpose_m(SIZE_T rows, SIZE_T cols, DATA_T A[rows][cols], DATA_T B[cols][rows]) {
-	SIZE_T i, j;
-	for (i=0; i<cols; ++i) {
-		for (j=0; j<rows; j+=2) {
-			B[i][j] = A[j][i];
+//cache friendly matrix transpose
+void transpose_m(SIZE_T rows, SIZE_T cols, DATA_T A[rows][cols], DATA_T B[cols][rows], SIZE_T start_i, SIZE_T end_i, SIZE_T start_j, SIZE_T end_j){
 
-			if(j+1 != rows){
-				B[i][j+1] = A[j+1][i];
+	SIZE_T l_i = end_i - start_i;
+	SIZE_T l_j = end_j - start_j;
+	SIZE_T i, j;
+	
+	if (l_i <= 2 && l_j <= 2) {
+		for (i = start_i; i < end_i; i++) {
+			for (j = start_j; j < end_j; j++) {
+				B[j][i] = A[i][j];
 			}
 		}
+	} else if (l_i >= l_j) {
+		transpose_m(rows, cols, A, B, start_i, start_i + (l_i / 2), start_j, end_j);
+		transpose_m(rows, cols, A, B, start_i + (l_i / 2), end_i, start_j, end_j);
+	} else {
+		transpose_m(rows, cols, A, B, start_i, end_i, start_j, start_j + (l_j / 2));
+		transpose_m(rows, cols, A, B, start_i, end_i, start_j + (l_j / 2), end_j);
 	}
 }
 
