@@ -26,7 +26,7 @@ int main(int argc, char *argv[]) {
 	SIZE_T i;
 	double time_taken = 0;
 
-	for(i = 0; i < 10000; i++){
+	//for(i = 0; i < 10000; i++){
 		start = clock();
 
 		zero_m(ROWS, COLS, A);
@@ -46,8 +46,8 @@ int main(int argc, char *argv[]) {
 	
 		// Calculating total time taken by the program.
 		time_taken += ((float) (finish - start)) / CLOCKS_PER_SEC;
-	}
-	printf ("Total time = %lf seconds\n", time_taken/10000.0);
+	//}
+	printf ("Total time = %lf seconds\n", time_taken);//10000.0);
 
 	return 0;
 }

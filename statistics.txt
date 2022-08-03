@@ -1,3 +1,6 @@
+performance is compared before optimization and then after. the new optimized version becomes the baseline for comparison against the next
+optimization.
+
 before loop unrolling:
 ./qr m20x20.txt output20x20.txt 20 20
 Total time = 0.003885 seconds
@@ -15,6 +18,17 @@ after for loop optimization:
 Total time = 0.003891 seconds
 
 before cache efficient matrix transpose:
-
+./qr m20x20.txt output20x20.txt 20 20
+Total time = 0.003820 seconds
 
 after cache efficient matrix transpose:
+./qr m20x20.txt output20x20.txt 20 20
+Total time = 0.003828 seconds
+
+before macros added:
+./qr m20x20.txt output20x20.txt 20 20
+Total time = 0.003623 seconds
+
+after macros added:
+
+
