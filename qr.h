@@ -16,7 +16,6 @@
 #define compute_f_n(x_0,x_) (x_0)*(x_0) - x_
 #define compute_xn(x_0,fn,fprime) x_0 - (fn / fprime)
 #define compute_l(end,start) end - start
-#define compute_index_shift(start,l) start + (l / 2)
 
 
 FILE *openf(char *fname, char *mode);
@@ -264,8 +263,8 @@ void vec_divc(SIZE_T size, NUM_T v[size], NUM_T divisor) {
 //cache friendly matrix transpose
 void transpose_m(SIZE_T rows, SIZE_T cols, DATA_T A[rows][cols], DATA_T B[cols][rows], SIZE_T start_i, SIZE_T end_i, SIZE_T start_j, SIZE_T end_j){
 
-	SIZE_T l_i = compute_l(end_i, start_i); //end_i - start_i;	//macro
-	SIZE_T l_j = compute_l(end_j, start_j); //end_j - start_j;	//macro
+	SIZE_T l_i = compute_l(end_i, start_i); //macro
+	SIZE_T l_j = compute_l(end_j, start_j); //macro
 	SIZE_T i, j;
 	
 	if (l_i <= 2 && l_j <= 2) {
@@ -275,11 +274,13 @@ void transpose_m(SIZE_T rows, SIZE_T cols, DATA_T A[rows][cols], DATA_T B[cols][
 			}
 		}
 	} else if (l_i >= l_j) {
-		transpose_m(rows, cols, A, B, start_i, compute_index_shift(start_i, l_i), start_j, end_j);	//macro
-		transpose_m(rows, cols, A, B, compute_index_shift(start_i, l_i), end_i, start_j, end_j);	//macro
+		l_i = l_i >> 1;	//operator strength reduction
+		transpose_m(rows, cols, A, B, start_i, start_i + l_i, start_j, end_j);
+		transpose_m(rows, cols, A, B, start_i + l_i, end_i, start_j, end_j);
 	} else {
-		transpose_m(rows, cols, A, B, start_i, end_i, start_j, compute_index_shift(start_j, l_j));	//macro
-		transpose_m(rows, cols, A, B, start_i, end_i, compute_index_shift(start_j, l_j), end_j);	//macro
+		l_j = l_j >> 1;	//operator strength reduction
+		transpose_m(rows, cols, A, B, start_i, end_i, start_j, start_j + l_j);
+		transpose_m(rows, cols, A, B, start_i, end_i, start_j + l_j, end_j);
 	}
 }
 

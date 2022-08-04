@@ -30,5 +30,13 @@ before macros added:
 Total time = 0.003623 seconds
 
 after macros added:
+./qr m20x20.txt output20x20.txt 20 20
+Total time = 0.003647 seconds
 
+before operator strength reduction:
+./qr m20x20.txt output20x20.txt 20 20
+Total time = 0.003727 seconds
 
+after operator strength reduction:
+./qr m20x20.txt output20x20.txt 20 20
+Total time = 0.003643 seconds
