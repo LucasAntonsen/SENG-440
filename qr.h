@@ -13,6 +13,10 @@
 #define EPSILON 1e-15
 #define MAX_ITER 46340
 
+#define compute_f_n(x_0,x_) (x_0)*(x_0) - x_
+#define compute_xn(x_0,fn,fprime) x_0 - (fn / fprime)
+#define compute_l(end,start) end - start
+
 
 FILE *openf(char *fname, char *mode);
 void fscanm(char *fname, char *delim, SIZE_T rows, SIZE_T cols, DATA_T A[rows][cols]);
@@ -77,9 +81,8 @@ NUM_T sqr_rt(NUM_T x, NUM_T eps, NUM_T tol, size_t max_iter) {
 	NUM_T f_n, f_prime;
 	size_t i;
 
-	// for(i=0; i<max_iter; ++i){
 	for (i=max_iter; i != 0; --i) { 
-		f_n = (x0 * x0) - x;
+		f_n = compute_f_n(x0, x); //macro
 		f_prime = 2. * x0;
 		
 		if (abs_val(f_prime) < eps) {
@@ -87,7 +90,7 @@ NUM_T sqr_rt(NUM_T x, NUM_T eps, NUM_T tol, size_t max_iter) {
 			break;
 		}
 		
-		xn = x0 - (f_n / f_prime);
+		xn = compute_xn(x0, f_n, f_prime); //macro
 		err = abs_val(xn - x0);
 		if (err <= tol) {
 			break;	
@@ -103,7 +106,6 @@ int closest_perfect_square(DATA_T x, size_t max_iter) {
 	int sq = 0, xn = 1;
 	size_t i;
 
-	//for (i=0; i<max_iter; i+=2) {
 	for (i=max_iter; i!=0; i-=2) {
 		sq = xn * xn;
 		if (sq > (int)x) {
@@ -247,7 +249,7 @@ void vec_divc(SIZE_T size, NUM_T v[size], NUM_T divisor) {
 	assert(divisor > EPSILON);	
 	SIZE_T i;
 
-	NUM_T div = 1/divisor;	//optimization
+	NUM_T div = 1/divisor;	//operator strength reduction
 	
 	for (i=0; i<size; i+=2) {
 		v[i] *= div;
@@ -261,8 +263,8 @@ void vec_divc(SIZE_T size, NUM_T v[size], NUM_T divisor) {
 //cache friendly matrix transpose
 void transpose_m(SIZE_T rows, SIZE_T cols, DATA_T A[rows][cols], DATA_T B[cols][rows], SIZE_T start_i, SIZE_T end_i, SIZE_T start_j, SIZE_T end_j){
 
-	SIZE_T l_i = end_i - start_i;
-	SIZE_T l_j = end_j - start_j;
+	SIZE_T l_i = compute_l(end_i, start_i); //macro
+	SIZE_T l_j = compute_l(end_j, start_j); //macro
 	SIZE_T i, j;
 	
 	if (l_i <= 2 && l_j <= 2) {
@@ -272,11 +274,13 @@ void transpose_m(SIZE_T rows, SIZE_T cols, DATA_T A[rows][cols], DATA_T B[cols][
 			}
 		}
 	} else if (l_i >= l_j) {
-		transpose_m(rows, cols, A, B, start_i, start_i + (l_i / 2), start_j, end_j);
-		transpose_m(rows, cols, A, B, start_i + (l_i / 2), end_i, start_j, end_j);
+		l_i = l_i >> 1;	//operator strength reduction
+		transpose_m(rows, cols, A, B, start_i, start_i + l_i, start_j, end_j);
+		transpose_m(rows, cols, A, B, start_i + l_i, end_i, start_j, end_j);
 	} else {
-		transpose_m(rows, cols, A, B, start_i, end_i, start_j, start_j + (l_j / 2));
-		transpose_m(rows, cols, A, B, start_i, end_i, start_j + (l_j / 2), end_j);
+		l_j = l_j >> 1;	//operator strength reduction
+		transpose_m(rows, cols, A, B, start_i, end_i, start_j, start_j + l_j);
+		transpose_m(rows, cols, A, B, start_i, end_i, start_j + l_j, end_j);
 	}
 }
 
