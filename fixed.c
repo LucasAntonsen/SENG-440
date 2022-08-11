@@ -22,9 +22,8 @@
 void bin_fx_to_str(char *s, UFX_T x, FX_SIZE_T scale);
 void fx_to_str(char *s, UFX_T x, FX_SIZE_T scale);
 UFX_T str_to_fx(char *s, char *delim, FX_SIZE_T scale);
-UFX_T fract_dec_to_bin(UFX_T x, FX_SIZE_T zeros);
-UFX_T get_threshold(UFX_T x, FX_SIZE_T offset);
-FX_SIZE_T leading_zeros(char *s);
+UFX_T fract_dec_to_bin(UFX_T x, UFX_T threshold);
+UFX_T get_threshold(char *s, FX_SIZE_T digits);
 FX_SIZE_T dlen(UFX_T x);
 FX_SIZE_T blen(UFX_T x);
 void printb(UFX_T x);
@@ -36,7 +35,7 @@ void reorder(FX_T *x);
 int main() {
 	char delim[FX_MAX_DEC_CHARS] = ".";
 	char output[FX_MAX_BIN_CHARS];
-	char input[FX_MAX_DEC_CHARS] = "-1086.0004";
+	char input[FX_MAX_DEC_CHARS] = "10861.945";
 	printf("input = %s\n", input);
 
 
@@ -53,8 +52,8 @@ UFX_T str_to_fx(char *s, char *delim, FX_SIZE_T scale) {
 	FX_SIZE_T sign = 0;
 	FX_T whole = 0;
 	UFX_T fract = 0;
-	FX_SIZE_T offset = 0;
-	FX_SIZE_T zeros = 0;
+	FX_SIZE_T digits = 0;
+	UFX_T threshold = 0;
 	
 	char *p;
 	char *tok = strtok(s, delim);	
@@ -66,20 +65,14 @@ UFX_T str_to_fx(char *s, char *delim, FX_SIZE_T scale) {
 	}
 
 	tok = strtok(NULL, delim);
-	if (tok != NULL) { 
-		zeros = leading_zeros(tok);
+	if (tok != NULL) {
+		digits = strnlen(tok, FX_MAX_DEC_CHARS); 
+		threshold = get_threshold(tok, digits);
 		fract = (UFX_T) strtoul(tok, &p, 10);
-		fract = fract_dec_to_bin(fract, zeros);
-		offset = scale - blen(fract);
+		fract = fract_dec_to_bin(fract, threshold);
 	}
-	return (sign) ? FX_SIGN | (whole << scale) | (fract << offset) :
-					(whole << scale) | (fract << offset);
-}
-
-FX_SIZE_T leading_zeros(char *s) {
-	FX_SIZE_T zeros = 0;
-	for (; s[zeros] == '0' && zeros < FX_SIZE; ++zeros);
-	return zeros;
+	return (sign) ? FX_SIGN | (whole << scale) | fract :
+					(whole << scale) | fract;
 }
 
 void bin_fx_to_str(char *s, UFX_T x, FX_SIZE_T scale) {
@@ -100,6 +93,7 @@ void bin_fx_to_str(char *s, UFX_T x, FX_SIZE_T scale) {
 		i = 1;
 		++max_chars;
 	}
+
 	s[FX_WHOLE_BITS + i + 1] = '.';
 	
 	for (; i < max_chars; ++i) {
@@ -122,32 +116,26 @@ void fx_to_str(char *s, UFX_T x, FX_SIZE_T scale) {
 	}
 }
 
-UFX_T fract_dec_to_bin(UFX_T x, FX_SIZE_T zeros) {
-	UFX_T threshold = get_threshold(x, zeros);	
+UFX_T fract_dec_to_bin(UFX_T x, UFX_T threshold) {
 	UFX_T fract_bin = 0;
 	FX_SIZE_T i = 0;
 		
 	for (; i < FX_FRACT_BITS; ++i) {
+		fract_bin <<= 1;	
 		if ((x <<= 1) > threshold) {
 			fract_bin |= 1;
 			x -= threshold;
 		}
-		fract_bin <<= 1;
 	}
 	return fract_bin;
 }
 
-UFX_T get_threshold(UFX_T x, FX_SIZE_T leading_zeros) {
-	FX_SIZE_T digits = dlen(x) + leading_zeros;
+UFX_T get_threshold(char *s, FX_SIZE_T digits) {
 	UFX_T threshold = 10;
 	FX_SIZE_T i = 1;
 	for (; i < digits; ++i) {
 		threshold *= 10;
 	}
-	//printf("leading zeros = %u\n", leading_zeros);
-	//printf("x = %u\n", x);
-	//printf("digits = %u\n", digits);	
-	//printf("threshold = %u\n", threshold);
 	return threshold;	
 }
 
