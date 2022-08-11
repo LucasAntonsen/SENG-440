@@ -28,4 +28,4 @@ Total time = 0.736600 seconds
 operator strength reduction:
 arm-linux-gcc -static -O2 qr.c -o qr4.exe
 ./qr4.exe m20x20.txt out.txt 20 20
-Total time = 0.739100 seconds
+Total time = 0.738400 seconds
