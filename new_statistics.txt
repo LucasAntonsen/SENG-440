@@ -1,0 +1,31 @@
+run 100 times
+
+base:
+arm-linux-gcc -static -O2 qr.c -o qr_base.exe
+./qr_base.exe m20x20.txt out.txt 20 20
+Total time = 0.739600 seconds
+
+loop unrolled:
+arm-linux-gcc -static -O2 qr.c -o qr.exe
+./qr.exe m20x20.txt out.txt 20 20
+Total time = 0.736900 seconds
+
+for loop optimized:
+arm-linux-gcc -static -O2 qr.c -o qr1.exe
+./qr1.exe m20x20.txt out.txt 20 20
+Total time = 0.736600 seconds
+
+cache-oblivious matrix transpose:
+arm-linux-gcc -static -O2 qr.c -o qr2.exe
+./qr2.exe m20x20.txt out.txt 20 20
+Total time = 0.736400 seconds
+
+macros:
+arm-linux-gcc -static -O2 qr.c -o qr3.exe
+./qr3.exe m20x20.txt out.txt 20 20
+Total time = 0.736600 seconds
+
+operator strength reduction:
+arm-linux-gcc -static -O2 qr.c -o qr4.exe
+./qr4.exe m20x20.txt out.txt 20 20
+Total time = 0.738400 seconds
