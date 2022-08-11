@@ -19,10 +19,10 @@ Finally,
 
 $$A = [e_1|e_2|\cdots|e_n] 
 \begin{bmatrix}
-a_{1}\cdot e_1 & a_{2}\cdot e_1 & \cdots & a_{n}\cdot e_1\\
-0 & a_{2}\cdot e_2 & \cdots & a_{n}\cdot e_2\\ 
+v_{1}\cdot e_1 & v_{2}\cdot e_1 & \cdots & v_{n}\cdot e_1\\
+0 & v_{2}\cdot e_2 & \cdots & v_{n}\cdot e_2\\ 
 \vdots & \vdots & \ddots & \vdots\\ 
-0 & 0 & \cdots & a_{n}\cdot e_n
+0 & 0 & \cdots & v_{n}\cdot e_n
 \end{bmatrix}
 = QR$$
 
