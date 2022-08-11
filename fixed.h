@@ -32,53 +32,35 @@ void reorder(FX_T *x);
 
 
 
-int main() {
-	char delim[FX_MAX_DEC_CHARS] = ".";
-	char output[FX_MAX_BIN_CHARS];
-	char input[FX_MAX_DEC_CHARS] = "10861.945";
-	printf("input = %s\n", input);
-
-
-	UFX_T num = str_to_fx(input, delim, FX_FRACT_BITS);
-	printf("fx num bin = ");
-	printb(num);
-	bin_fx_to_str(output, num, FX_FRACT_BITS);
-
-	printf("output = %s\n", output);
-	return 0;
-}
-
 UFX_T str_to_fx(char *s, char *delim, FX_SIZE_T scale) {
 	FX_SIZE_T sign = 0;
-	FX_T whole = 0;
-	UFX_T fract = 0;
+	FX_T num = 0;
 	FX_SIZE_T digits = 0;
 	UFX_T threshold = 0;
 	
 	char *p;
 	char *tok = strtok(s, delim);	
-	whole = (FX_T) strtol(tok, &p, 10);	
-	if (whole < 0) {
+	num = (FX_T) strtol(tok, &p, 10);	
+	if (num < 0) {
 		sign = 1;
-		whole -= 1;
-		whole = ~whole;	
+		num -= 1;
+		num = ~num;	
 	}
+	num = ((UFX_T) num << scale);
 
 	tok = strtok(NULL, delim);
 	if (tok != NULL) {
 		digits = strnlen(tok, FX_MAX_DEC_CHARS); 
 		threshold = get_threshold(tok, digits);
-		fract = (UFX_T) strtoul(tok, &p, 10);
-		fract = fract_dec_to_bin(fract, threshold);
+		num |= fract_dec_to_bin((UFX_T) strtoul(tok, &p, 10), threshold);
 	}
-	return (sign) ? FX_SIGN | (whole << scale) | fract :
-					(whole << scale) | fract;
+	return (sign) ? FX_SIGN | num : num;
 }
 
 void bin_fx_to_str(char *s, UFX_T x, FX_SIZE_T scale) {
+	FX_SIZE_T max_chars = FX_MAX_BIN_CHARS - 1;		
 	UFX_T stack = 0;
 	FX_SIZE_T i = 0;
-	FX_SIZE_T max_chars = FX_MAX_BIN_CHARS - 1;	
 
 	for (; i < FX_SIZE; ++i) {
 		stack <<= 1;	
@@ -170,4 +152,3 @@ void printb(UFX_T x) {
 	}
 	printf("\n");	
 }
-
