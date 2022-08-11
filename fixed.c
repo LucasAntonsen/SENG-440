@@ -32,7 +32,7 @@ void reorder(FX_T *x);
 int main() {
 	char delim[FX_MAX_DEC_CHARS] = ".";
 	char output[FX_MAX_BIN_CHARS];
-	char input[FX_MAX_DEC_CHARS] = "-10861.9845";
+	char input[FX_MAX_DEC_CHARS] = "10861.9845";
 	printf("input = %s\n", input);
 
 
@@ -54,7 +54,7 @@ UFX_T str_to_fx(char *s, char *delim, FX_SIZE_T scale) {
 	char *p;
 	char *tok = strtok(s, delim);	
 	whole = (FX_T) strtol(tok, &p, 10);	
-	if (whole) {
+	if (whole < 0) {
 		sign = 1;
 		whole -= 1;
 		whole = ~whole;	
@@ -73,6 +73,7 @@ UFX_T str_to_fx(char *s, char *delim, FX_SIZE_T scale) {
 void bin_fx_to_str(char *s, UFX_T x, FX_SIZE_T scale) {
 	UFX_T stack = 0;
 	FX_SIZE_T i = 0;
+	FX_SIZE_T max_chars = FX_MAX_BIN_CHARS;	
 
 	for (; i < FX_SIZE; ++i) {
 		stack <<= 1;	
@@ -85,7 +86,9 @@ void bin_fx_to_str(char *s, UFX_T x, FX_SIZE_T scale) {
 	if (stack & 1) {
 		s[0] = '-';	
 		i = 1;
+		++max_chars;
 	}
+	--max_chars;
 	s[FX_WHOLE_BITS + i + 1] = '.';
 
 	for (; s[i] != '.'; ++i) {
@@ -93,7 +96,7 @@ void bin_fx_to_str(char *s, UFX_T x, FX_SIZE_T scale) {
 		stack >>= 1;
 	}		
 	
-	for (++i; i < FX_MAX_BIN_CHARS; ++i) {
+	for (++i; i < max_chars; ++i) {
 		s[i] = '0' + (stack & 1);
 		stack >>= 1;
 	}		
