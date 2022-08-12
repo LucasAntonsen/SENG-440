@@ -77,7 +77,6 @@ NUM_T sqr_rt(NUM_T x, NUM_T eps, NUM_T tol, size_t max_iter) {
 	NUM_T f_n, f_prime;
 	size_t i;
 
-	// for(i=0; i<max_iter; ++i){
 	for (i=max_iter; i != 0; --i) { 
 		f_n = (x0 * x0) - x;
 		f_prime = 2. * x0;
@@ -103,7 +102,6 @@ int closest_perfect_square(DATA_T x, size_t max_iter) {
 	int sq = 0, xn = 1;
 	size_t i;
 
-	//for (i=0; i<max_iter; i+=2) {
 	for (i=max_iter; i!=0; i-=2) {
 		sq = xn * xn;
 		if (sq > (int)x) {
