@@ -98,7 +98,7 @@ void fx_to_str(char *s, UFX_T x, FX_SIZE_T scale) {
 	}
 }
 
-UFX_T fract_dec_to_bin(UFX_T x, UFX_T threshold) {
+inline UFX_T fract_dec_to_bin(UFX_T x, UFX_T threshold) {
 	UFX_T fract_bin = 0;
 	FX_SIZE_T i = 0;
 		
@@ -112,7 +112,7 @@ UFX_T fract_dec_to_bin(UFX_T x, UFX_T threshold) {
 	return fract_bin;
 }
 
-UFX_T get_threshold(char *s, FX_SIZE_T digits) {
+inline UFX_T get_threshold(char *s, FX_SIZE_T digits) {
 	UFX_T threshold = 10;
 	FX_SIZE_T i = 1;
 	for (; i < digits; ++i) {
@@ -121,7 +121,7 @@ UFX_T get_threshold(char *s, FX_SIZE_T digits) {
 	return threshold;	
 }
 
-FX_SIZE_T blen(UFX_T x) {
+inline FX_SIZE_T blen(UFX_T x) {
 	FX_SIZE_T bits = 0;
 	for (; x > 0; x >>= 1) {
 		++bits;
@@ -129,7 +129,7 @@ FX_SIZE_T blen(UFX_T x) {
 	return bits;
 }
 
-FX_SIZE_T dlen(UFX_T x) {
+inline FX_SIZE_T dlen(UFX_T x) {
 	FX_SIZE_T digits = 0; 
 	for (; x > 0; x /= 10) {
 		++digits;
@@ -137,7 +137,7 @@ FX_SIZE_T dlen(UFX_T x) {
 	return digits;
 }
 
-void printb(UFX_T x) {
+inline void printb(UFX_T x) {
 	UFX_T stack = 0;
 	FX_SIZE_T bits = blen(x);
 	FX_SIZE_T count = 0;
