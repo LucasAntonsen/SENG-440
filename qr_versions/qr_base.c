@@ -311,17 +311,12 @@ char *spec_map(char type) {
 	return spec;	
 }
 
-//loop unrolling done
 void zero_m(SIZE_T rows, SIZE_T cols, DATA_T M[rows][cols]){
 	SIZE_T i, j;
 
 	for(i = 0; i < rows; i++){
-		for(j = 0; j < cols; j+=2){
+		for(j = 0; j < cols; j++){
 			M[i][j] = 0;
-
-			if(j+1 != cols){
-				M[i][j+1] = 0;
-			}
 		}
 	}
 }
