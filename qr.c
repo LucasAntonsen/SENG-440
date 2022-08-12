@@ -5,9 +5,18 @@
 #include <assert.h>
 #include "qr.h"
 #include <time.h>
+#include "fixed.h"
 
 
 int main(int argc, char *argv[]) {
+	char output[FX_MAX_BIN_CHARS];	
+	char input[FX_MAX_DEC_CHARS] = "-1086.432";
+	char decimal[] = ".";
+	printf("decimal string input = %s\n", input);	
+	UFX_T fx = str_to_fx(input, decimal, FX_FRACT_BITS);	
+	bin_fx_to_str(output, fx);
+	printf("fixed point binary string = %s\n", output);
+
 	clock_t start, finish;
 
 	char *end;

@@ -19,16 +19,14 @@
 
 
 
-void bin_fx_to_str(char *s, UFX_T x, FX_SIZE_T scale);
+void bin_fx_to_str(char *s, UFX_T x);
 void fx_to_str(char *s, UFX_T x, FX_SIZE_T scale);
 UFX_T str_to_fx(char *s, char *delim, FX_SIZE_T scale);
-UFX_T fract_dec_to_bin(UFX_T x, UFX_T threshold);
-UFX_T get_threshold(char *s, FX_SIZE_T digits);
-FX_SIZE_T dlen(UFX_T x);
-FX_SIZE_T blen(UFX_T x);
-void printb(UFX_T x);
-char bmap(FX_T x);
-void reorder(FX_T *x);
+inline UFX_T fract_dec_to_bin(UFX_T x, UFX_T threshold);
+inline UFX_T get_threshold(char *s, FX_SIZE_T digits);
+inline FX_SIZE_T dlen(UFX_T x);
+inline FX_SIZE_T blen(UFX_T x);
+inline void printb(UFX_T x);
 
 
 
@@ -57,7 +55,7 @@ UFX_T str_to_fx(char *s, char *delim, FX_SIZE_T scale) {
 	return (sign) ? FX_SIGN | num : num;
 }
 
-void bin_fx_to_str(char *s, UFX_T x, FX_SIZE_T scale) {
+void bin_fx_to_str(char *s, UFX_T x) {
 	FX_SIZE_T max_chars = FX_MAX_BIN_CHARS - 1;		
 	UFX_T stack = 0;
 	FX_SIZE_T i = 0;
@@ -79,11 +77,11 @@ void bin_fx_to_str(char *s, UFX_T x, FX_SIZE_T scale) {
 	s[FX_WHOLE_BITS + i + 1] = '.';
 	
 	for (; i < max_chars; ++i) {
-		if (s[i] == '.') continue; 
+		if ('.' == s[i]) continue; 
 		s[i] = '0' + (stack & 1);
 		stack >>= 1;
 	}		
-	
+	s[FX_MAX_BIN_CHARS] = '\0';	
 }
 
 void fx_to_str(char *s, UFX_T x, FX_SIZE_T scale) {
