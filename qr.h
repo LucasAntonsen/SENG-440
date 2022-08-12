@@ -126,137 +126,137 @@ NUM_T abs_val(NUM_T x) {
 	return (NUM_T) ((x < 0.) ? -x : x);
 }
 
-//loop unrolling done
+//loop unrolling done.
 void numt_copy_col(SIZE_T rows, SIZE_T cols, SIZE_T target_col, NUM_T src[rows][cols], NUM_T dest[rows]) {
 	SIZE_T i;
-	for (i=0; i<rows; i+=2) {
+	for (i=0; i<rows-1; i+=2) {
 		dest[i] = src[i][target_col];
-
-		if(i+1 != rows){
-			dest[i+1] = src[i+1][target_col];
-		}
+		dest[i+1] = src[i+1][target_col];
+	}
+	if(rows & 1){
+		dest[rows-1] = src[rows-1][target_col];
 	}
 }
 
-//loop unrolling done
+//loop unrolling done.
 void numt_set_col(SIZE_T rows, SIZE_T cols, SIZE_T target_col, NUM_T v[rows], NUM_T A[rows][cols]) {
     SIZE_T i;
 
-    for (i=0; i<rows; i+=2) {
+    for (i=0; i<rows-1; i+=2) {
         A[i][target_col] = (NUM_T) v[i];
-
-		if(i+1 != rows){
-			A[i+1][target_col] = (NUM_T) v[i+1];
-		}
+		A[i+1][target_col] = (NUM_T) v[i+1];
     }
+	if(rows & 1){
+		A[rows-1][target_col] = (NUM_T) v[rows-1];
+	}
 }
 
-//loop unrolling done
+//loop unrolling done.
 void mat_set_col(SIZE_T rows, SIZE_T cols, SIZE_T target_col, DATA_T v[rows], DATA_T A[rows][cols]) {
 	SIZE_T i;
 
-	for(i=0; i<rows; i+=2){
+	for(i=0; i<rows-1; i+=2){
 		A[i][target_col] = v[i];
-
-		if(i+1 != rows){
-			A[i+1][target_col] = v[i+1];
-		}
+		A[i+1][target_col] = v[i+1];
+	}
+	if(rows & 1){
+		A[rows-1][target_col] = v[rows-1];
 	}
 }
 
-//loop unrolling done
+//loop unrolling done.
 void vec_sub(SIZE_T size, NUM_T v1[size], NUM_T v2[size]) {
 	SIZE_T i;
 
-	for(i=0; i<size; i+=2){
+	for(i=0; i<size-1; i+=2){
 		v2[i] -= v1[i];
-
-		if(i+1 != size){
-			v2[i+1] -= v1[i+1];
-		}
+		v2[i+1] -= v1[i+1];
+	}
+	if(size & 1){
+		v2[size-1] -= v1[size-1];
 	}
 }
 
-//loop unrolling done
+//loop unrolling done.
 void numt_vec_copy(SIZE_T size, NUM_T src[size], NUM_T dest[size]) {
 	SIZE_T i;
 
-	for(i=0; i<size; i+=2){
+	for(i=0; i<size-1; i+=2){
 		dest[i] = (NUM_T) src[i];
-
-		if(i+1 != size){
-			dest[i+1] = (NUM_T) src[i+1];;
-		}
+		dest[i+1] = (NUM_T) src[i+1];;
+	}
+	if(size & 1){
+		dest[size-1] = (NUM_T) src[size-1];
 	}
 }
 
-//loop unrolling done
+//loop unrolling done.
 void vec_copy(SIZE_T size, DATA_T src[size], NUM_T dest[size]) {
     SIZE_T i;
 
-    for (i=0; i<size; i+=2) {
+    for (i=0; i<size-1; i+=2) {
         dest[i] = (NUM_T) src[i];
-
-		if(i+1 != size){
-			dest[i+1] = (NUM_T) src[i+1];
-		}
+		dest[i+1] = (NUM_T) src[i+1];
     }
+	if(size & 1){
+		dest[size-1] = (NUM_T) src[size-1];
+	}
 }
 
-//loop unrolling done
+//loop unrolling done.
 NUM_T vec_dot(SIZE_T size, NUM_T v1[size], NUM_T v2[size]) {
 	NUM_T res = 0;
 	SIZE_T i;
 	
-	for (i=0; i<size; i+=2) {
+	for (i=0; i<size-1; i+=2) {
 		res += (v1[i] * v2[i]);
-
-		if(i+1 != size){
-			res += (v1[i+1] * v2[i+1]);
-		}
+		res += (v1[i+1] * v2[i+1]);
+	}
+	if(size & 1){
+		res += (v1[size-1] * v2[size-1]);
 	}
 	return res;
 }
 
-//loop unrolling done
+//loop unrolling done.
 void vec_mulc(SIZE_T size, NUM_T v[size], NUM_T c) {
 	SIZE_T i;
 
-	for (i=0; i<size; i+=2) {
+	for (i=0; i<size-1; i+=2) {
 		v[i] *= c;
-
-		if(i+1 != size){
-			v[i+1] *= c;
-		}
+		v[i+1] *= c;
+	}
+	if(size & 1){
+		v[size-1] *= c;
 	}
 }
 
-//loop unrolling done
+//loop unrolling done.
 void vec_mul(SIZE_T size, NUM_T src[size], NUM_T dest[size]) {
 	SIZE_T i;	
 
-	for (i=0; i<size; i+=2) {
+	for (i=0; i<size-1; i+=2) {
 		dest[i] *= src[i];
-
-		if(i+1 != size){
-			dest[i+1] *= src[i+1];
-		}
+		dest[i+1] *= src[i+1];
+	}
+	if(size & 1){
+		dest[size-1] *= src[size-1];
 	}	
 }
 
-//loop unrolling done
+//loop unrolling done.
 void vec_divc(SIZE_T size, NUM_T v[size], NUM_T divisor) {
 	assert(divisor > EPSILON);	
 	SIZE_T i;
 
 	NUM_T div = 1/divisor;	//operator strength reduction
 	
-	for (i=0; i<size; i+=2) {
+	for (i=0; i<size-1; i+=2){
 		v[i] *= div;
-
-		if(i+1 != size){
-			v[i+1] *= div;
-		}
+		v[i+1] *= div;
+	}
+	if(size & 1){
+		v[size-1] *= div;
 	}	
 }
 
@@ -305,20 +305,22 @@ void fscanm(char *fname, char *delim, SIZE_T rows, SIZE_T cols, DATA_T A[rows][c
 	fclose(fptr);	
 }
 
+//loop unrolling done.
 void fprintmt(char *fname, char *delim, SIZE_T rows, SIZE_T cols, NUM_T A[rows][cols]) {
 	FILE *fptr = openf(fname, "a");
 	char *spec = spec_map(NUM_T_KEY);
 	SIZE_T i, j;
 	
 	for (i=0; i<rows; ++i) {
-		for (j=0; j<cols; j+=2) {
+		for (j=0; j<cols-1; j+=2) {
 			fprintf(fptr, spec, A[i][j]);
 			fprintf(fptr, delim);
-
-			if(j+1 != cols){
-				fprintf(fptr, spec, A[i][j+1]);
-				fprintf(fptr, delim);
-			}
+			fprintf(fptr, spec, A[i][j+1]);
+			fprintf(fptr, delim);
+		}
+		if(cols & 1){
+			fprintf(fptr, spec, A[i][cols-1]);
+			fprintf(fptr, delim);
 		}
 		fprintf(fptr, "\n");
 	}
@@ -326,21 +328,22 @@ void fprintmt(char *fname, char *delim, SIZE_T rows, SIZE_T cols, NUM_T A[rows][
 	fclose(fptr);
 }
 
-//debugging function
+//debugging function.
 void fprintm(char *fname, char *delim, SIZE_T rows, SIZE_T cols, DATA_T A[rows][cols]) {
 	FILE *fptr = openf(fname, "a");
 	char *spec = spec_map(DATA_T_KEY);
 	SIZE_T i, j;
 	
 	for (i=0; i<rows; ++i) {
-		for (j=0; j<cols; j+=2) {
+		for (j=0; j<cols-1; j+=2) {
 			fprintf(fptr, spec, A[i][j]);
 			fprintf(fptr, delim);
-
-			if(j+1 != cols){
-				fprintf(fptr, spec, A[i][j+1]);
-				fprintf(fptr, delim);
-			}
+			fprintf(fptr, spec, A[i][j+1]);
+			fprintf(fptr, delim);
+		}
+		if(cols & 1){
+			fprintf(fptr, spec, A[i][cols-1]);
+			fprintf(fptr, delim);
 		}
 		fprintf(fptr, "\n");
 	}
@@ -348,20 +351,21 @@ void fprintm(char *fname, char *delim, SIZE_T rows, SIZE_T cols, DATA_T A[rows][
 	fclose(fptr);
 }
 
-//debugging function
+//debugging function.
 void printm(char *delim, SIZE_T rows, SIZE_T cols, DATA_T A[rows][cols]) {
 	char *spec = spec_map(DATA_T_KEY);
 	SIZE_T i, j;	
 	
 	for (i=0; i<rows; ++i) {
-		for (j=0; j<cols; j+=2) {
+		for (j=0; j<cols-1; j+=2) {
 			printf(spec, A[i][j]);
 			printf(delim);
-
-			if(j+1 != cols){
-				printf(spec, A[i][j+1]);
-				printf(delim);
-			}
+			printf(spec, A[i][j+1]);
+			printf(delim);
+		}
+		if(cols & 1){
+			printf(spec, A[i][cols-1]);
+			printf(delim);
 		}
 		printf("\n");
 	}	
@@ -410,17 +414,17 @@ char *spec_map(char type) {
 	return spec;	
 }
 
-//loop unrolling done
+//loop unrolling done.
 void zero_m(SIZE_T rows, SIZE_T cols, DATA_T M[rows][cols]){
 	SIZE_T i, j;
 
 	for(i = 0; i < rows; i++){
-		for(j = 0; j < cols; j+=2){
+		for(j = 0; j < cols-1; j+=2){
 			M[i][j] = 0;
-
-			if(j+1 != cols){
-				M[i][j+1] = 0;
-			}
+			M[i][j+1] = 0;
+		}
+		if(cols & 1){
+			M[i][cols-1] = 0;
 		}
 	}
 }
