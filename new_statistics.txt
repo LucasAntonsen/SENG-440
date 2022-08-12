@@ -29,3 +29,8 @@ operator strength reduction:
 arm-linux-gcc -static -O2 qr.c -o qr4.exe
 ./qr4.exe m20x20.txt out.txt 20 20
 Total time = 0.738400 seconds
+
+improved loop unroll:
+arm-linux-gcc -static -O2 qr.c -o qr5.exe
+./qr5.exe m20x20.txt out.txt 20 20
+Total time = 0.745700 seconds
