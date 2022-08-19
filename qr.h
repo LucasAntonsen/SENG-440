@@ -44,6 +44,7 @@ void numt_copy_col(SIZE_T rows, SIZE_T cols, SIZE_T target_col, NUM_T src[rows][
 void zero_m(SIZE_T rows, SIZE_T cols, DATA_T M[rows][cols]);
 
 
+//performs modified gram-schmidt orthogonalization algorithm
 void QR(SIZE_T rows, SIZE_T cols, DATA_T At[cols][rows], NUM_T Q[rows][rows], NUM_T R[rows][cols]) {
 	assert(rows >= cols);
 	NUM_T y[rows], q[rows];
@@ -66,6 +67,7 @@ void QR(SIZE_T rows, SIZE_T cols, DATA_T At[cols][rows], NUM_T Q[rows][rows], NU
 	}
 }
 
+//calculates the magnitude of a vector using the Euclidean norm
 NUM_T l2_norm(SIZE_T size, NUM_T v[size]) {
 	NUM_T res;		
 	res = vec_dot(size, v, v);
@@ -73,7 +75,7 @@ NUM_T l2_norm(SIZE_T size, NUM_T v[size]) {
 	return res;
 }
 
-//optimized for loop
+//calculates the square root of a number via the Newton-Raphson method
 NUM_T sqr_rt(NUM_T x, NUM_T eps, NUM_T tol, size_t max_iter) {
 	assert((int)x >= 0);
 	NUM_T x0 = (NUM_T) closest_perfect_square(x, MAX_ITER);
@@ -81,7 +83,7 @@ NUM_T sqr_rt(NUM_T x, NUM_T eps, NUM_T tol, size_t max_iter) {
 	NUM_T f_n, f_prime;
 	size_t i;
 
-	for (i=max_iter; i != 0; --i) { 
+	for (i=max_iter; i != 0; --i) { //optimized for loop
 		f_n = compute_f_n(x0, x); //macro
 		f_prime = 2. * x0;
 		
@@ -100,20 +102,19 @@ NUM_T sqr_rt(NUM_T x, NUM_T eps, NUM_T tol, size_t max_iter) {
 	return xn;
 }
 
-//loop unrolling done
-//optimized for loop
+//calculates the integer which when squared is closest to the input number
 int closest_perfect_square(DATA_T x, size_t max_iter) {
 	int sq = 0, xn = 1;
 	size_t i;
 
-	for (i=max_iter; i!=0; i-=2) {
+	for (i=max_iter; i!=0; i-=2) {	//optimized for loop
 		sq = xn * xn;
 		if (sq > (int)x) {
 			break;
 		}
 		xn += 1;
 
-		sq = xn * xn;
+		sq = xn * xn;		//loop unrolling done
 		if (sq > (int)x) {
 			break;
 		}
@@ -122,14 +123,15 @@ int closest_perfect_square(DATA_T x, size_t max_iter) {
 	return xn;
 }
 
+//Calculates the absolute value of a given number
 NUM_T abs_val(NUM_T x) {
 	return (NUM_T) ((x < 0.) ? -x : x);
 }
 
-//loop unrolling done.
+//copies a column vector of a given matrix into another vector
 void numt_copy_col(SIZE_T rows, SIZE_T cols, SIZE_T target_col, NUM_T src[rows][cols], NUM_T dest[rows]) {
 	SIZE_T i;
-	for (i=0; i<rows-1; i+=2) {
+	for (i=0; i<rows-1; i+=2) {			//loop unrolling done.
 		dest[i] = src[i][target_col];
 		dest[i+1] = src[i+1][target_col];
 	}
@@ -138,11 +140,11 @@ void numt_copy_col(SIZE_T rows, SIZE_T cols, SIZE_T target_col, NUM_T src[rows][
 	}
 }
 
-//loop unrolling done.
+//sets the column of a given matrix to the elements from the given vector
 void numt_set_col(SIZE_T rows, SIZE_T cols, SIZE_T target_col, NUM_T v[rows], NUM_T A[rows][cols]) {
     SIZE_T i;
 
-    for (i=0; i<rows-1; i+=2) {
+    for (i=0; i<rows-1; i+=2) {				//loop unrolling done.
         A[i][target_col] = (NUM_T) v[i];
 		A[i+1][target_col] = (NUM_T) v[i+1];
     }
@@ -151,11 +153,11 @@ void numt_set_col(SIZE_T rows, SIZE_T cols, SIZE_T target_col, NUM_T v[rows], NU
 	}
 }
 
-//loop unrolling done.
+//sets the column of a given matrix to the elements from the given vector
 void mat_set_col(SIZE_T rows, SIZE_T cols, SIZE_T target_col, DATA_T v[rows], DATA_T A[rows][cols]) {
 	SIZE_T i;
 
-	for(i=0; i<rows-1; i+=2){
+	for(i=0; i<rows-1; i+=2){		//loop unrolling done.
 		A[i][target_col] = v[i];
 		A[i+1][target_col] = v[i+1];
 	}
@@ -164,11 +166,11 @@ void mat_set_col(SIZE_T rows, SIZE_T cols, SIZE_T target_col, DATA_T v[rows], DA
 	}
 }
 
-//loop unrolling done.
+//subtracts one vector from another vector
 void vec_sub(SIZE_T size, NUM_T v1[size], NUM_T v2[size]) {
 	SIZE_T i;
 
-	for(i=0; i<size-1; i+=2){
+	for(i=0; i<size-1; i+=2){	//loop unrolling done.
 		v2[i] -= v1[i];
 		v2[i+1] -= v1[i+1];
 	}
@@ -177,24 +179,24 @@ void vec_sub(SIZE_T size, NUM_T v1[size], NUM_T v2[size]) {
 	}
 }
 
-//loop unrolling done.
+//copies a vector to another vector
 void numt_vec_copy(SIZE_T size, NUM_T src[size], NUM_T dest[size]) {
 	SIZE_T i;
 
-	for(i=0; i<size-1; i+=2){
+	for(i=0; i<size-1; i+=2){			//loop unrolling done.
 		dest[i] = (NUM_T) src[i];
-		dest[i+1] = (NUM_T) src[i+1];;
+		dest[i+1] = (NUM_T) src[i+1];
 	}
 	if(size & 1){
 		dest[size-1] = (NUM_T) src[size-1];
 	}
 }
 
-//loop unrolling done.
+//copies a vector to another vector
 void vec_copy(SIZE_T size, DATA_T src[size], NUM_T dest[size]) {
     SIZE_T i;
 
-    for (i=0; i<size-1; i+=2) {
+    for (i=0; i<size-1; i+=2) {		//loop unrolling done.
         dest[i] = (NUM_T) src[i];
 		dest[i+1] = (NUM_T) src[i+1];
     }
@@ -203,12 +205,12 @@ void vec_copy(SIZE_T size, DATA_T src[size], NUM_T dest[size]) {
 	}
 }
 
-//loop unrolling done.
+//performs the dot product of two vectors
 NUM_T vec_dot(SIZE_T size, NUM_T v1[size], NUM_T v2[size]) {
 	NUM_T res = 0;
 	SIZE_T i;
 	
-	for (i=0; i<size-1; i+=2) {
+	for (i=0; i<size-1; i+=2){		//loop unrolling done.
 		res += (v1[i] * v2[i]);
 		res += (v1[i+1] * v2[i+1]);
 	}
@@ -218,11 +220,11 @@ NUM_T vec_dot(SIZE_T size, NUM_T v1[size], NUM_T v2[size]) {
 	return res;
 }
 
-//loop unrolling done.
+//multiplies a given vector by a constant
 void vec_mulc(SIZE_T size, NUM_T v[size], NUM_T c) {
 	SIZE_T i;
 
-	for (i=0; i<size-1; i+=2) {
+	for (i=0; i<size-1; i+=2){	//loop unrolling done.
 		v[i] *= c;
 		v[i+1] *= c;
 	}
@@ -231,11 +233,11 @@ void vec_mulc(SIZE_T size, NUM_T v[size], NUM_T c) {
 	}
 }
 
-//loop unrolling done.
+//multiplies two vectors source and destination, and stores the result in the destination
 void vec_mul(SIZE_T size, NUM_T src[size], NUM_T dest[size]) {
 	SIZE_T i;	
 
-	for (i=0; i<size-1; i+=2) {
+	for (i=0; i<size-1; i+=2){	//loop unrolling done.
 		dest[i] *= src[i];
 		dest[i+1] *= src[i+1];
 	}
@@ -244,14 +246,14 @@ void vec_mul(SIZE_T size, NUM_T src[size], NUM_T dest[size]) {
 	}	
 }
 
-//loop unrolling done.
+//divides a vector by a constant
 void vec_divc(SIZE_T size, NUM_T v[size], NUM_T divisor) {
 	assert(divisor > EPSILON);	
 	SIZE_T i;
 
 	NUM_T div = 1/divisor;	//operator strength reduction
 	
-	for (i=0; i<size-1; i+=2){
+	for (i=0; i<size-1; i+=2){	//loop unrolling done.
 		v[i] *= div;
 		v[i+1] *= div;
 	}
@@ -261,6 +263,7 @@ void vec_divc(SIZE_T size, NUM_T v[size], NUM_T divisor) {
 }
 
 //cache friendly matrix transpose
+//computes the matrix transpose of matrix A and stores it in matrix B
 void transpose_m(SIZE_T rows, SIZE_T cols, DATA_T A[rows][cols], DATA_T B[cols][rows], SIZE_T start_i, SIZE_T end_i, SIZE_T start_j, SIZE_T end_j){
 
 	SIZE_T l_i = compute_l(end_i, start_i); //macro
@@ -284,6 +287,7 @@ void transpose_m(SIZE_T rows, SIZE_T cols, DATA_T A[rows][cols], DATA_T B[cols][
 	}
 }
 
+//converts the matrix from the input file into a 2D array
 void fscanm(char *fname, char *delim, SIZE_T rows, SIZE_T cols, DATA_T A[rows][cols]) {
 	FILE *fptr = openf(fname, "r");	
 	SIZE_T line_size = 0;
@@ -305,13 +309,13 @@ void fscanm(char *fname, char *delim, SIZE_T rows, SIZE_T cols, DATA_T A[rows][c
 	fclose(fptr);	
 }
 
-//loop unrolling done.
+//outputs matrix to a file
 void fprintmt(char *fname, char *delim, SIZE_T rows, SIZE_T cols, NUM_T A[rows][cols]) {
 	FILE *fptr = openf(fname, "a");
 	char *spec = spec_map(NUM_T_KEY);
 	SIZE_T i, j;
 	
-	for (i=0; i<rows; ++i) {
+	for (i=0; i<rows; ++i) {				//loop unrolling done.
 		for (j=0; j<cols-1; j+=2) {
 			fprintf(fptr, spec, A[i][j]);
 			fprintf(fptr, delim);
@@ -329,13 +333,14 @@ void fprintmt(char *fname, char *delim, SIZE_T rows, SIZE_T cols, NUM_T A[rows][
 }
 
 //debugging function.
+//outputs matrix to a file
 void fprintm(char *fname, char *delim, SIZE_T rows, SIZE_T cols, DATA_T A[rows][cols]) {
 	FILE *fptr = openf(fname, "a");
 	char *spec = spec_map(DATA_T_KEY);
 	SIZE_T i, j;
 	
 	for (i=0; i<rows; ++i) {
-		for (j=0; j<cols-1; j+=2) {
+		for (j=0; j<cols-1; j+=2) {			//loop unrolling done.
 			fprintf(fptr, spec, A[i][j]);
 			fprintf(fptr, delim);
 			fprintf(fptr, spec, A[i][j+1]);
@@ -352,12 +357,13 @@ void fprintm(char *fname, char *delim, SIZE_T rows, SIZE_T cols, DATA_T A[rows][
 }
 
 //debugging function.
+//outputs matrix to standard output
 void printm(char *delim, SIZE_T rows, SIZE_T cols, DATA_T A[rows][cols]) {
 	char *spec = spec_map(DATA_T_KEY);
 	SIZE_T i, j;	
 	
 	for (i=0; i<rows; ++i) {
-		for (j=0; j<cols-1; j+=2) {
+		for (j=0; j<cols-1; j+=2) {		//loop unrolling done.
 			printf(spec, A[i][j]);
 			printf(delim);
 			printf(spec, A[i][j+1]);
@@ -372,6 +378,7 @@ void printm(char *delim, SIZE_T rows, SIZE_T cols, DATA_T A[rows][cols]) {
 }
 
 //debugging function
+//outputs vector to standard output
 void printv(SIZE_T size, DATA_T v[size]) {
 	char *spec = spec_map(DATA_T_KEY);
 	SIZE_T i;
@@ -382,6 +389,7 @@ void printv(SIZE_T size, DATA_T v[size]) {
 	}
 }
 
+//opens file and returns file pointer
 FILE *openf(char *fname, char *mode) {
 	FILE *fptr = fopen(fname, mode);	
 	
@@ -392,6 +400,7 @@ FILE *openf(char *fname, char *mode) {
 	return fptr;
 }
 
+//maps the input data type to its corresponding type specifier
 char *spec_map(char type) {
 	char *spec;
 	switch (type) {
@@ -414,12 +423,12 @@ char *spec_map(char type) {
 	return spec;	
 }
 
-//loop unrolling done.
+//zeroes out matrix to avoid garbage values
 void zero_m(SIZE_T rows, SIZE_T cols, DATA_T M[rows][cols]){
 	SIZE_T i, j;
 
 	for(i = 0; i < rows; i++){
-		for(j = 0; j < cols-1; j+=2){
+		for(j = 0; j < cols-1; j+=2){	//loop unrolling done.
 			M[i][j] = 0;
 			M[i][j+1] = 0;
 		}
