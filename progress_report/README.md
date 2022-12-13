@@ -1,5 +1,5 @@
 # SENG 440 Progress Report: QR Decomposition
-By Ty Ellison (V00916580) and Lucas Antonsen (V00923982)
+By Ty Ellison and Lucas Antonsen
 
 ## Project Specifications
 Our project shall make use of the C programming language and an ARM-based processor to create a QR Decomposition program. QR decomposition is useful in a variety of problems such as the Least Squares Problem and results in a matrix that is easier to use in certain capacities [1]. Our program shall use the Gram-Schmidt Orthogonalization algorithm.
