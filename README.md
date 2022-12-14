@@ -1,13 +1,13 @@
 # QR Decomposition in C: Optimizing for ARM920T
 ## By Lucas Antonsen and Ty Ellison
 
-In the UVic course, **SENG 440: Embedded Systems**, we developed a QR Decomposition program using Modified Gram-Schmidt Orthogonalization for the ARM920T processor.
+In the UVic course, **SENG 440: Embedded Systems**, we developed a QR Decomposition program using [Modified Gram-Schmidt Orthogonalization (MGSO)](https://www.laurenthoeltgen.name/post/gram-schmidt/) for the ARM920T processor.
 
 QR decomposition is where a matrix, $A$, is decomposed to an orthogonal matrix, $Q$, and an upper triangular matrix, $R$, $(A = QR)$.
 
 e.g.
 
-$$A =
+$$A = 
 \begin{bmatrix}
 12 & -51 & 4\\
 6 & 167 & -68\\
@@ -24,3 +24,12 @@ $$A =
 \frac{-2}{7} & \frac{6}{35} & \frac{-33}{35}\\
 \end{bmatrix}
 = QR$$
+
+After implementing the program using MGSO, we performed the following optimizations to improve the efficiency of the program:
+
+- Loop unrolling
+- For loop optimization
+- Cache-oblivious matrix transpose
+- Math macros
+- Operator strength reduction
+- Branch reduction.
