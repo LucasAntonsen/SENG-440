@@ -3,7 +3,7 @@
 
 In the UVic course, **SENG 440: Embedded Systems**, we developed a QR Decomposition program using [Modified Gram-Schmidt Orthogonalization (MGSO)](https://www.laurenthoeltgen.name/post/gram-schmidt/) for the ARM920T processor.
 
-QR decomposition is where a matrix, $A$, is decomposed to an orthogonal matrix, $Q$, and an upper triangular matrix, $R$, $(A = QR)$.
+QR decomposition is where a matrix, $A$, is decomposed to an orthogonal matrix, $Q$, and an upper triangular matrix, $R$, i.e. $(A = QR)$.
 
 e.g.
 
@@ -25,7 +25,7 @@ $$A =
 \end{bmatrix}
 = QR$$
 
-After implementing the program using MGSO, we performed the following optimizations to improve the efficiency of the program:
+After implementing the program using MGSO, we performed the following optimizations in the order below to improve the efficiency of the program:
 
 - Loop unrolling
 - For loop optimization
@@ -33,3 +33,15 @@ After implementing the program using MGSO, we performed the following optimizati
 - Math macros
 - Operator strength reduction
 - Branch reduction.
+
+---
+
+### Directory Description
+
+```asm``` Contains assembly files corresponding to the various versions of the QR program.  
+```data``` Contains sample input data for the QR program.  
+```final_report``` Contains final report and presentation slides for the QR program.  
+```progress_report``` Contains progress report from midway through course.  
+```qr_versions``` Contains the various versions of the QR program as optimizations are introduced.  
+```src``` Contains the final version of the QR program.  
+```stats``` Contains statistics for the various versions of the QR program when run on the ARM920T.
