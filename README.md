@@ -38,10 +38,10 @@ After implementing the program using MGSO, we performed the following optimizati
 
 ### Directory Description
 
-```asm``` Contains assembly files corresponding to the various versions of the QR program.  
-```data``` Contains sample input data for the QR program.  
-```final_report``` Contains final report and presentation slides for the QR program.  
-```progress_report``` Contains progress report from midway through course.  
-```qr_versions``` Contains the various versions of the QR program as optimizations are introduced.  
-```src``` Contains the final version of the QR program.  
-```stats``` Contains statistics for the various versions of the QR program when run on the ARM920T.
+```asm``` Assembly files corresponding to the various versions of the QR program.  
+```data``` Sample input data for the QR program.  
+```final_report``` Final report and presentation slides for the QR program.  
+```progress_report``` Progress report from midway through course.  
+```qr_versions``` Various versions of the QR program as optimizations are introduced.  
+```src``` Final version of the QR program.  
+```stats``` Statistics for the various versions of the QR program when run on the ARM920T.
