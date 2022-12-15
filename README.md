@@ -42,6 +42,6 @@ After implementing the program using MGSO, we performed the following optimizati
 ```data``` Sample input data for the QR program.  
 ```final_report``` Final report and presentation slides for the QR program.  
 ```progress_report``` Progress report from midway through course.  
-```qr_versions``` Various versions of the QR program as optimizations are introduced.  
+```qr_versions``` Versions of the QR program as optimizations are introduced.  
 ```src``` Final version of the QR program.  
 ```stats``` Statistics for the various versions of the QR program when run on the ARM920T.
